@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Investment Agent v23</title>
+<title>Investment Agent v24</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -26,7 +26,7 @@
   --blue:#1460ae; --bluebg:#dceeff; --blueborder:#8dc0f0;
   --purple:#5a2fa8; --purplebg:#ede8fb; --purpleborder:#c0a8f0;
   --orange:#c05a00; --orangebg:#fff0e0; --orangeborder:#f5c88a;
-  --t1:#0d1e35; --t2:#3a5470; --t3:#7a9ab8;
+  --t1:#0d1e35; --t2:#1e3a55; --t3:#4a6e8a;
   --sidebar:#1a3a5c;
   --font-body:'Outfit',sans-serif; --font-mono:'JetBrains Mono',monospace;
 }
@@ -206,10 +206,43 @@ select.fi{cursor:pointer}
   .stat-grid{grid-template-columns:repeat(2,1fr)}
   .grid2,.grid3{grid-template-columns:1fr}
   .form-row-2,.form-row-3,.form-row-4{grid-template-columns:1fr}
-  .sidebar{width:52px;min-width:52px}
-  .logo-name,.logo-sub,.nav-btn span,.sidebar-foot-text{display:none}
-  .nav-btn{justify-content:center;padding:10px}
   .pb,.ph{padding-left:14px;padding-right:14px}
+  /* Hamburger: sidebar hidden by default on mobile */
+  .sidebar{
+    position:fixed;top:0;right:0;height:100vh;
+    width:240px;min-width:240px;
+    transform:translateX(100%);
+    transition:transform .28s cubic-bezier(.4,0,.2,1);
+    z-index:200;
+    box-shadow:-4px 0 24px rgba(20,60,110,.25);
+  }
+  .sidebar.open{transform:translateX(0)}
+  /* Overlay behind open sidebar */
+  .mob-overlay{display:none;position:fixed;inset:0;background:rgba(10,30,55,.45);z-index:199;backdrop-filter:blur(2px)}
+  .mob-overlay.visible{display:block}
+  /* Top mobile bar */
+  .mob-topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    position:fixed;top:0;right:0;left:0;height:52px;
+    background:var(--sidebar);z-index:198;
+    padding:0 16px;
+    box-shadow:0 2px 8px rgba(20,60,110,.2);
+  }
+  .mob-topbar-title{color:#fff;font-size:16px;font-weight:700;letter-spacing:.5px}
+  .mob-topbar-title span{color:#60c8ff}
+  .ham-btn{
+    background:none;border:none;cursor:pointer;
+    display:flex;flex-direction:column;gap:5px;padding:6px;
+  }
+  .ham-btn span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .25s}
+  .ham-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .ham-btn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+  .ham-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  /* Push content down on mobile */
+  .main{padding-top:52px}
+}
+@media(min-width:821px){
+  .mob-topbar,.mob-overlay,.ham-btn{display:none!important}
 }
 
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -263,7 +296,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v23</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v24</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -306,11 +339,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
 <div id="app">
 
+<!-- ═══ MOBILE TOPBAR (hamburger) ═══ -->
+<div class="mob-topbar" id="mobTopbar">
+  <div class="mob-topbar-title">Invest<span>.</span>Agent</div>
+  <button class="ham-btn" id="hamBtn" onclick="toggleSidebar()" aria-label="תפריט">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+<div class="mob-overlay" id="mobOverlay" onclick="closeSidebar()"></div>
+
 <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v23</div>
+    <div class="logo-sub">PORTFOLIO · v24</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -1115,7 +1157,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v23';
+const APP_VERSION = 'v24';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -2833,11 +2875,30 @@ function updateApiKeyUI(){
 // ═══════════════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════════════
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const btn=document.getElementById('hamBtn');
+  const ov=document.getElementById('mobOverlay');
+  const open=sb.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  ov.classList.toggle('visible',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeSidebar(){
+  const sb=document.getElementById('sidebar');
+  const btn=document.getElementById('hamBtn');
+  const ov=document.getElementById('mobOverlay');
+  sb.classList.remove('open');
+  btn.classList.remove('open');
+  ov.classList.remove('visible');
+  document.body.style.overflow='';
+}
 function showPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const page=document.getElementById('page-'+name);if(page)page.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
+  if(window.innerWidth<=820)closeSidebar();
   if(name==='alerts'){renderAlertsList();markAllRead();}
   if(name==='agent'){renderLatestAnalyses();renderMemoryPanel();updateAgentStats();}
   if(name==='insurance')renderInsurance();
