@@ -2361,58 +2361,59 @@ async function loadDetail(ticker,range){
     ${(()=>{
       const buyLayers = sec?.layers||[];
       const sellLayers = sec?.sellLayers||[];
+      if(!buyLayers.length && !sellLayers.length) return '';
       const totalBought = buyLayers.reduce((s,l)=>s+l.qty,0);
       const totalSold   = sellLayers.reduce((s,l)=>s+l.qty,0);
       const remaining   = Math.max(0, totalBought - totalSold);
       const avgCost     = secAvgCost(sec);
+      const cur         = sec?.currency||'USD';
       let html = '';
 
       if(buyLayers.length){
-        html += \`<div class="card" style="margin-top:12px;border-right:3px solid var(--green)">
-          <div class="card-title" style="color:var(--green)">📗 שכבות קנייה (${buyLayers.length})</div>
-          <table class="layers-table">
-            <thead><tr><th>תאריך</th><th>כמות</th><th>מחיר קנייה</th><th>מטבע</th><th>רווח/הפסד</th><th>תשואה</th></tr></thead>
-            <tbody>\${buyLayers.map(l=>{
-              const pl=price?(price-l.price)*l.qty:null;
-              const ret=l.price?((price-l.price)/l.price*100):null;
-              return \`<tr style="background:var(--greenbg)">
-                <td>\${fmtDateHe(l.date)}</td><td>\${l.qty}</td>
-                <td>\${fmtCur(l.price,l.payCurrency||sec.currency)}</td>
-                <td>\${l.payCurrency||sec.currency}</td>
-                <td class="\${clsPL(pl)}">\${pl!=null?fmtCur(pl,l.payCurrency||sec.currency,0):'—'}</td>
-                <td class="\${clsPL(ret)}">\${ret!=null?fmtPct(ret):'—'}</td>
-              </tr>\`;
-            }).join('')}</tbody>
-          </table>
-        </div>\`;
+        const rows = buyLayers.map(l=>{
+          const pl = price ? (price-l.price)*l.qty : null;
+          const ret = l.price ? ((price-l.price)/l.price*100) : null;
+          return '<tr style="background:var(--greenbg)">'
+            +'<td>'+fmtDateHe(l.date)+'</td>'
+            +'<td>'+l.qty+'</td>'
+            +'<td>'+fmtCur(l.price,l.payCurrency||cur)+'</td>'
+            +'<td>'+(l.payCurrency||cur)+'</td>'
+            +'<td class="'+(pl>=0?'up':'dn')+'">'+(pl!=null?fmtCur(pl,l.payCurrency||cur,0):'—')+'</td>'
+            +'<td class="'+(ret>=0?'up':'dn')+'">'+(ret!=null?fmtPct(ret):'—')+'</td>'
+            +'</tr>';
+        }).join('');
+        html += '<div class="card" style="margin-top:12px;border-right:3px solid var(--green)">'
+          +'<div class="card-title" style="color:var(--green)">📗 שכבות קנייה ('+buyLayers.length+')</div>'
+          +'<table class="layers-table"><thead><tr>'
+          +'<th>תאריך</th><th>כמות</th><th>מחיר קנייה</th><th>מטבע</th><th>רווח/הפסד</th><th>תשואה</th>'
+          +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
       }
 
       if(sellLayers.length){
-        html += \`<div class="card" style="margin-top:12px;border-right:3px solid var(--red)">
-          <div class="card-title" style="color:var(--red)">📕 שכבות מכירה (${sellLayers.length})</div>
-          <table class="layers-table">
-            <thead><tr><th>תאריך</th><th>כמות</th><th>מחיר מכירה</th><th>מס</th><th>נטו</th><th>עמלה</th></tr></thead>
-            <tbody>\${sellLayers.map(l=>\`<tr style="background:var(--redbg)">
-              <td>\${fmtDateHe(l.date)}</td><td>\${l.qty}</td>
-              <td>\${fmtCur(l.price,l.currency||sec.currency)}</td>
-              <td class="dn">\${l.tax?fmtCur(l.tax,l.currency||sec.currency):'—'}</td>
-              <td>\${l.netAmount?fmtCur(l.netAmount,l.currency||sec.currency):'—'}</td>
-              <td>\${l.brokerFee?fmtCur(l.brokerFee,l.currency||sec.currency):'—'}</td>
-            </tr>\`).join('')}</tbody>
-          </table>
-        </div>\`;
+        const rows = sellLayers.map(l=>{
+          return '<tr style="background:var(--redbg)">'
+            +'<td>'+fmtDateHe(l.date)+'</td>'
+            +'<td>'+l.qty+'</td>'
+            +'<td>'+fmtCur(l.price,l.currency||cur)+'</td>'
+            +'<td class="dn">'+(l.tax?fmtCur(l.tax,l.currency||cur):'—')+'</td>'
+            +'<td>'+(l.netAmount?fmtCur(l.netAmount,l.currency||cur):'—')+'</td>'
+            +'<td>'+(l.brokerFee?fmtCur(l.brokerFee,l.currency||cur):'—')+'</td>'
+            +'</tr>';
+        }).join('');
+        html += '<div class="card" style="margin-top:12px;border-right:3px solid var(--red)">'
+          +'<div class="card-title" style="color:var(--red)">📕 שכבות מכירה ('+sellLayers.length+')</div>'
+          +'<table class="layers-table"><thead><tr>'
+          +'<th>תאריך</th><th>כמות</th><th>מחיר מכירה</th><th>מס</th><th>נטו</th><th>עמלה</th>'
+          +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
       }
 
-      if(buyLayers.length||sellLayers.length){
-        html += \`<div class="card" style="margin-top:8px;background:var(--bg2)">
-          <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:var(--font-mono);font-size:13px">
-            <span>📦 סה"כ נרכש: <strong>\${totalBought} יח'</strong></span>
-            <span style="color:var(--red)">📤 סה"כ נמכר: <strong>\${totalSold} יח'</strong></span>
-            <span style="color:var(--green)">✅ נשאר: <strong>\${remaining} יח'</strong></span>
-            \${avgCost?\`<span>מחיר ממוצע: <strong>\${fmtCur(avgCost,sec.currency)}</strong></span>\`:''}
-          </div>
-        </div>\`;
-      }
+      html += '<div class="card" style="margin-top:8px;background:var(--bg2)">'
+        +'<div style="display:flex;gap:24px;flex-wrap:wrap;font-family:var(--font-mono);font-size:13px">'
+        +'<span>📦 סה&quot;כ נרכש: <strong>'+totalBought+' יח.</strong></span>'
+        +'<span style="color:var(--red)">📤 סה&quot;כ נמכר: <strong>'+totalSold+' יח.</strong></span>'
+        +'<span style="color:var(--green)">✅ נשאר: <strong>'+remaining+' יח.</strong></span>'
+        +(avgCost?'<span>מחיר ממוצע: <strong>'+fmtCur(avgCost,cur)+'</strong></span>':'')
+        +'</div></div>';
       return html;
     })()}`;
 
