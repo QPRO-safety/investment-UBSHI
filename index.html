@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v26</title>
+<title>Investment Agent v27</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -278,6 +278,8 @@ select.fi{cursor:pointer}
 
   /* ── Stat grid: 1 column on very small screens ── */
   .stat-grid-2{grid-template-columns:1fr 1fr}
+  /* Employee shares: 3 cols on mobile */
+  #sdxStats{grid-template-columns:repeat(3,1fr)!important}
 
   /* ── Table scroll hint ── */
   .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -345,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v26</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v27</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -401,7 +403,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v26</div>
+    <div class="logo-sub">PORTFOLIO · v27</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -691,7 +693,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="pb">
 
     <!-- SDX Summary -->
-    <div class="stat-grid" id="sdxStats" style="margin-bottom:8px">
+    <div class="stat-grid" id="sdxStats" style="margin-bottom:8px;grid-template-columns:repeat(6,1fr)">
       <div class="stat"><div class="stat-label">SDX — זמין למכירה</div><div class="stat-val" id="sdxAvailQty">—</div><div class="stat-sub" id="sdxAvailVal">SW.PA</div></div>
       <div class="stat"><div class="stat-label">SDX — מחיר נוכחי</div><div class="stat-val" id="sdxCurrentPrice">—</div><div class="stat-sub" id="sdxPriceChg">EUR</div></div>
       <div class="stat"><div class="stat-label">SDX — שווי כיום</div><div class="stat-val" id="sdxTotalVal">—</div><div class="stat-sub" id="sdxTotalILS">—</div></div>
@@ -1233,7 +1235,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v26';
+const APP_VERSION = 'v27';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1338,8 +1340,9 @@ function seedPortfolio() {
       ...s,
       // Always preserve user-entered fields
       target:   saved.target   !== undefined ? saved.target   : s.target,
-      stopLoss: saved.stopLoss !== undefined ? saved.stopLoss : s.stopLoss,
-      notes:    saved.notes    || s.notes,
+      stopLoss:   saved.stopLoss   !== undefined ? saved.stopLoss   : s.stopLoss,
+      notes:      saved.notes      || s.notes,
+      sellLayers: saved.sellLayers || s.sellLayers || [],
       layers:   saved.layers?.length ? saved.layers : s.layers,
       watchReason: saved.watchReason || s.watchReason,
     };
@@ -1371,7 +1374,7 @@ function secAvgCost(s) {
   const totalQty  = s.layers.reduce((sum,l) => sum + l.qty, 0);
   return totalQty > 0 ? totalCost / totalQty : 0;
 }
-function secTotalQty(s)  { return s.layers ? s.layers.reduce((sum,l)=>sum+l.qty,0) : (s.qty||0); }
+function secTotalQty(s)  { const bought=(s.layers||[]).reduce((sum,l)=>sum+l.qty,0); const sold=(s.sellLayers||[]).reduce((sum,l)=>sum+l.qty,0); return Math.max(0,bought-sold); }
 function secTotalCost(s) { return s.layers ? s.layers.reduce((sum,l)=>sum+(l.price*l.qty),0) : 0; }
 function secEarliestDate(s) { if (!s.layers||!s.layers.length) return null; return s.layers.slice().sort((a,b)=>a.date>b.date?1:-1)[0].date; }
 
@@ -1491,7 +1494,7 @@ async function fetchQuote(ticker){
   // 3. allorigins proxy → Yahoo Finance (works from file://)
   try{
     const yt=encodeURIComponent(ticker);
-    const yUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${yt}?interval=1d&range=2d`;
+    const yUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${yt}?interval=1m&range=1d`;
     const r=await tFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(yUrl)}`);
     const w=await r.json();
     const d=JSON.parse(w.contents);
@@ -1506,7 +1509,7 @@ async function fetchQuote(ticker){
   // 4. thingproxy → Yahoo (second fallback for file://)
   try{
     const yt=encodeURIComponent(ticker);
-    const r=await tFetch(`https://thingproxy.freeboard.io/fetch/https://query2.finance.yahoo.com/v8/finance/chart/${yt}?interval=1d&range=2d`);
+    const r=await tFetch(`https://thingproxy.freeboard.io/fetch/https://query2.finance.yahoo.com/v8/finance/chart/${yt}?interval=1m&range=1d`);
     const d=await r.json();
     const meta=d.chart.result[0].meta;
     const price=meta.regularMarketPrice;
@@ -1514,6 +1517,21 @@ async function fetchQuote(ticker){
     const data={price,change:price-prev,changePct:prev?((price-prev)/prev)*100:0,prevClose:prev,high:meta.regularMarketDayHigh||price,low:meta.regularMarketDayLow||price};
     quoteCache.set(ticker,{data,ts:Date.now()});
     return data;
+  }catch(e){}
+
+  // 5. corsproxy.io → Yahoo (last resort for iPhone Safari)
+  try{
+    const yt=encodeURIComponent(ticker);
+    const r=await tFetch(`https://corsproxy.io/?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+yt+'?interval=1m&range=1d')}`);
+    const d=await r.json();
+    const meta=d?.chart?.result?.[0]?.meta;
+    if(meta?.regularMarketPrice){
+      const price=meta.regularMarketPrice;
+      const prev=meta.chartPreviousClose||price;
+      const data={price,change:price-prev,changePct:prev?((price-prev)/prev)*100:0,prevClose:prev,high:meta.regularMarketDayHigh||price,low:meta.regularMarketDayLow||price};
+      quoteCache.set(ticker,{data,ts:Date.now()});
+      return data;
+    }
   }catch(e){}
 
   return null;
@@ -2234,7 +2252,7 @@ function applyBuyToPortfolio(entry){
   }
 }
 
-// Apply a sell transaction to portfolio layers (FIFO)
+// Apply a sell transaction — adds a sellLayer (does NOT delete buy layers)
 function applySellToPortfolio(entry){
   if(!entry.ticker||!entry.qty) return;
   const securities=loadSecurities();
@@ -2244,41 +2262,32 @@ function applySellToPortfolio(entry){
     return;
   }
   const sec=securities[secIdx];
-  if(!sec.layers||!sec.layers.length) return;
+  if(!sec.sellLayers) sec.sellLayers=[];
 
-  // FIFO: sort layers oldest first
-  sec.layers.sort((a,b)=>a.date>b.date?1:-1);
+  // Add a sell layer
+  sec.sellLayers.push({
+    id: Date.now().toString(),
+    date: entry.date,
+    qty: entry.qty,
+    price: entry.price,
+    currency: entry.currency||sec.currency,
+    tax: entry.tax||0,
+    netAmount: entry.netAmount||0,
+    brokerFee: entry.brokerFee||0,
+    reason: entry.reason||''
+  });
 
-  let remainToSell=entry.qty;
-  const soldLayers=[];
+  // Calculate remaining qty
+  const totalBought = (sec.layers||[]).reduce((s,l)=>s+l.qty,0);
+  const totalSold   = sec.sellLayers.reduce((s,l)=>s+l.qty,0);
+  const remaining   = totalBought - totalSold;
 
-  for(let i=0;i<sec.layers.length&&remainToSell>0;i++){
-    const layer=sec.layers[i];
-    if(layer.qty<=remainToSell){
-      // Sell entire layer
-      remainToSell-=layer.qty;
-      soldLayers.push({...layer, soldQty:layer.qty});
-      sec.layers[i]=null; // mark for removal
-    } else {
-      // Partial sell of this layer
-      soldLayers.push({...layer, soldQty:remainToSell});
-      layer.qty-=remainToSell;
-      remainToSell=0;
-    }
-  }
-
-  // Remove fully sold layers
-  sec.layers=sec.layers.filter(l=>l!==null);
-
-  const totalQtyLeft=sec.layers.reduce((s,l)=>s+l.qty,0);
-
-  if(totalQtyLeft<=0){
-    // Fully sold — move to archive
+  if(remaining<=0){
     securities[secIdx]={...sec, list:'sold', soldDate:entry.date, soldPrice:entry.price, soldNote:entry.reason||''};
     pushAlert(entry.ticker,'JOURNAL_SELL',`✦ מכירה מלאה ב-${entry.date}: ${entry.ticker} — הנייר הועבר לארכיון`,'red');
   } else {
     securities[secIdx]=sec;
-    pushAlert(entry.ticker,'JOURNAL_SELL',`✦ מכירה חלקית ב-${entry.date}: ${entry.qty} יח' ${entry.ticker} — נשאר ${totalQtyLeft} יח'`,'yellow');
+    pushAlert(entry.ticker,'JOURNAL_SELL',`✦ מכירה חלקית ב-${entry.date}: ${entry.qty} יח' ${entry.ticker} — נשאר ${remaining} יח'`,'yellow');
   }
 
   saveSecurities(securities);
@@ -2350,15 +2359,66 @@ async function loadDetail(ticker,range){
         <div class="kv-row"><span class="kv-k">מומנטום 10 ימים</span><span class="kv-v ${clsPL(parseFloat(calcMom(closes,10)))}">${calcMom(closes,10)||'—'}%</span></div>
         <div class="kv-row"><span class="kv-k">מומנטום 30 ימים</span><span class="kv-v ${clsPL(parseFloat(calcMom(closes,30)))}">${calcMom(closes,30)||'—'}%</span></div>
         ${sec?.layers?.length?`<div class="kv-row"><span class="kv-k">שכבות קנייה</span><span class="kv-v">${sec.layers.length}</span></div>`:''}
+      ${sec?.sellLayers?.length?`<div class="kv-row"><span class="kv-k" style="color:var(--red)">שכבות מכירה</span><span class="kv-v" style="color:var(--red)">${sec.sellLayers.length}</span></div>`:''}
       </div>
     </div>
-    ${sec?.layers?.length?`<div class="card" style="margin-top:12px">
-      <div class="card-title">שכבות קנייה</div>
-      <table class="layers-table">
-        <thead><tr><th>תאריך</th><th>כמות</th><th>מחיר</th><th>מטבע</th><th>רווח/הפסד</th><th>תשואה</th></tr></thead>
-        <tbody>${sec.layers.map(l=>{const pl=price?(price-l.price)*l.qty:null;const ret=l.price?((price-l.price)/l.price*100):null;return`<tr><td>${fmtDateHe(l.date)}</td><td>${l.qty}</td><td>${fmtCur(l.price,l.payCurrency||sec.currency)}</td><td>${l.payCurrency||sec.currency}</td><td class="${clsPL(pl)}">${pl!=null?fmtCur(pl,l.payCurrency||sec.currency,0):'—'}</td><td class="${clsPL(ret)}">${ret!=null?fmtPct(ret):'—'}</td></tr>`;}).join('')}</tbody>
-      </table>
-    </div>`:''}`;
+    ${(()=>{
+      const buyLayers = sec?.layers||[];
+      const sellLayers = sec?.sellLayers||[];
+      const totalBought = buyLayers.reduce((s,l)=>s+l.qty,0);
+      const totalSold   = sellLayers.reduce((s,l)=>s+l.qty,0);
+      const remaining   = Math.max(0, totalBought - totalSold);
+      const avgCost     = secAvgCost(sec);
+      let html = '';
+
+      if(buyLayers.length){
+        html += \`<div class="card" style="margin-top:12px;border-right:3px solid var(--green)">
+          <div class="card-title" style="color:var(--green)">📗 שכבות קנייה (${buyLayers.length})</div>
+          <table class="layers-table">
+            <thead><tr><th>תאריך</th><th>כמות</th><th>מחיר קנייה</th><th>מטבע</th><th>רווח/הפסד</th><th>תשואה</th></tr></thead>
+            <tbody>\${buyLayers.map(l=>{
+              const pl=price?(price-l.price)*l.qty:null;
+              const ret=l.price?((price-l.price)/l.price*100):null;
+              return \`<tr style="background:var(--greenbg)">
+                <td>\${fmtDateHe(l.date)}</td><td>\${l.qty}</td>
+                <td>\${fmtCur(l.price,l.payCurrency||sec.currency)}</td>
+                <td>\${l.payCurrency||sec.currency}</td>
+                <td class="\${clsPL(pl)}">\${pl!=null?fmtCur(pl,l.payCurrency||sec.currency,0):'—'}</td>
+                <td class="\${clsPL(ret)}">\${ret!=null?fmtPct(ret):'—'}</td>
+              </tr>\`;
+            }).join('')}</tbody>
+          </table>
+        </div>\`;
+      }
+
+      if(sellLayers.length){
+        html += \`<div class="card" style="margin-top:12px;border-right:3px solid var(--red)">
+          <div class="card-title" style="color:var(--red)">📕 שכבות מכירה (${sellLayers.length})</div>
+          <table class="layers-table">
+            <thead><tr><th>תאריך</th><th>כמות</th><th>מחיר מכירה</th><th>מס</th><th>נטו</th><th>עמלה</th></tr></thead>
+            <tbody>\${sellLayers.map(l=>\`<tr style="background:var(--redbg)">
+              <td>\${fmtDateHe(l.date)}</td><td>\${l.qty}</td>
+              <td>\${fmtCur(l.price,l.currency||sec.currency)}</td>
+              <td class="dn">\${l.tax?fmtCur(l.tax,l.currency||sec.currency):'—'}</td>
+              <td>\${l.netAmount?fmtCur(l.netAmount,l.currency||sec.currency):'—'}</td>
+              <td>\${l.brokerFee?fmtCur(l.brokerFee,l.currency||sec.currency):'—'}</td>
+            </tr>\`).join('')}</tbody>
+          </table>
+        </div>\`;
+      }
+
+      if(buyLayers.length||sellLayers.length){
+        html += \`<div class="card" style="margin-top:8px;background:var(--bg2)">
+          <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:var(--font-mono);font-size:13px">
+            <span>📦 סה"כ נרכש: <strong>\${totalBought} יח'</strong></span>
+            <span style="color:var(--red)">📤 סה"כ נמכר: <strong>\${totalSold} יח'</strong></span>
+            <span style="color:var(--green)">✅ נשאר: <strong>\${remaining} יח'</strong></span>
+            \${avgCost?\`<span>מחיר ממוצע: <strong>\${fmtCur(avgCost,sec.currency)}</strong></span>\`:''}
+          </div>
+        </div>\`;
+      }
+      return html;
+    })()}`;
 
   setTimeout(()=>{drawPriceChart('priceCanvas',hist,a);drawRSIChart('rsiCanvas',closes);},50);
   if(aiCache[ticker])injectAIIntoDetail(ticker,aiCache[ticker].result,aiCache[ticker].profile);
