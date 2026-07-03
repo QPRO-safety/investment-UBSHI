@@ -2,8 +2,8 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v26</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Investment Agent v24</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -26,12 +26,12 @@
   --blue:#1460ae; --bluebg:#dceeff; --blueborder:#8dc0f0;
   --purple:#5a2fa8; --purplebg:#ede8fb; --purpleborder:#c0a8f0;
   --orange:#c05a00; --orangebg:#fff0e0; --orangeborder:#f5c88a;
-  --t1:#0d1e35; --t2:#0d2840; --t3:#1e4060;
+  --t1:#0d1e35; --t2:#1e3a55; --t3:#4a6e8a;
   --sidebar:#1a3a5c;
   --font-body:'Outfit',sans-serif; --font-mono:'JetBrains Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:var(--font-body);font-size:15px;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;background-image:linear-gradient(160deg,#e0effc 0%,#f0f8ff 50%,#ddeaf8 100%);background-attachment:fixed}
+html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:var(--font-body);font-size:14px;-webkit-font-smoothing:antialiased;background-image:linear-gradient(160deg,#e0effc 0%,#f0f8ff 50%,#ddeaf8 100%);background-attachment:fixed}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:var(--bg0)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
@@ -62,7 +62,7 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:var(--fo
 /* ═══════ PAGE HEADER ═══════ */
 .ph{padding:24px 28px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .ph h1{font-size:22px;font-weight:700;color:var(--t1)}
-.ph-sub{font-family:var(--font-mono);font-size:12px;color:var(--t3);margin-top:4px}
+.ph-sub{font-family:var(--font-mono);font-size:11px;color:var(--t3);margin-top:4px}
 .ph-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:4px}
 .pb{padding:18px 28px 40px}
 
@@ -82,18 +82,18 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:var(--fo
 .stat-grid-3{grid-template-columns:repeat(3,1fr)}
 .stat-grid-2{grid-template-columns:repeat(2,1fr)}
 .stat{background:linear-gradient(135deg,#f4f9fe,#e8f3fc);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:var(--shadow)}
-.stat-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:8px}
-.stat-val{font-family:var(--font-mono);font-size:21px;font-weight:600;line-height:1;color:var(--t1)}
-.stat-sub{font-family:var(--font-mono);font-size:12px;margin-top:5px;color:var(--t2)}
+.stat-label{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:8px}
+.stat-val{font-family:var(--font-mono);font-size:20px;font-weight:500;line-height:1;color:var(--t1)}
+.stat-sub{font-family:var(--font-mono);font-size:11px;margin-top:5px;color:var(--t2)}
 
 /* ═══════ TABLES ═══════ */
 .tbl-wrap{background:#f4f9fe;border:1px solid var(--border);border-radius:10px;overflow:auto;box-shadow:var(--shadow)}
 table{width:100%;border-collapse:collapse;min-width:600px}
-thead th{padding:9px 12px;text-align:right;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);background:linear-gradient(90deg,#ddeef8,#cce5f5);border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500}
+thead th{padding:9px 12px;text-align:right;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);background:linear-gradient(90deg,#ddeef8,#cce5f5);border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500}
 tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:rgba(100,170,240,.1);cursor:pointer}
-tbody td{padding:10px 12px;font-size:14px;white-space:nowrap;color:var(--t1)}
+tbody td{padding:10px 12px;font-size:13px;white-space:nowrap;color:var(--t1)}
 .t-mono{font-family:var(--font-mono)}
 .up{color:var(--green)}.dn{color:var(--red)}.neu{color:var(--t2)}
 
@@ -109,14 +109,14 @@ tbody td{padding:10px 12px;font-size:14px;white-space:nowrap;color:var(--t1)}
 
 /* ═══════ CARDS ═══════ */
 .card{background:linear-gradient(135deg,#f4f9fe,#e8f3fc);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--shadow)}
-.card-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:12px;font-weight:500}
+.card-title{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:12px;font-weight:400}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 
 /* ═══════ FORM ═══════ */
 .fg{margin-bottom:12px}
-.fl{display:block;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:5px;font-weight:500}
-.fi{width:100%;background:#eaf3fc;border:1px solid var(--border);border-radius:7px;padding:10px 13px;color:var(--t1);font-size:15px;font-family:var(--font-body);outline:none;transition:border-color .15s;direction:rtl}
+.fl{display:block;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:4px}
+.fi{width:100%;background:#eaf3fc;border:1px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--t1);font-size:13px;font-family:var(--font-body);outline:none;transition:border-color .15s;direction:rtl}
 .fi:focus{border-color:var(--blue);background:#fff}
 .fi::placeholder{color:var(--t3)}
 select.fi{cursor:pointer}
@@ -144,7 +144,7 @@ select.fi{cursor:pointer}
 /* ═══════ SECTION HEADER ═══════ */
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
 .section-title{font-size:15px;font-weight:700;color:var(--t1)}
-.section-sub{font-size:13px;color:var(--t3);margin-top:2px}
+.section-sub{font-size:12px;color:var(--t3);margin-top:2px}
 
 /* ═══════ TABS ═══════ */
 .tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px}
@@ -203,92 +203,43 @@ select.fi{cursor:pointer}
 
 /* ═══════ RESPONSIVE ═══════ */
 @media(max-width:820px){
-  /* ── Grid layouts ── */
-  .stat-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
   .grid2,.grid3{grid-template-columns:1fr}
   .form-row-2,.form-row-3,.form-row-4{grid-template-columns:1fr}
   .pb,.ph{padding-left:14px;padding-right:14px}
-
-  /* ── Larger text on mobile ── */
-  body{font-size:15px}
-  .stat-val{font-size:22px}
-  .stat-label{font-size:11px;letter-spacing:.04em}
-  .stat-sub{font-size:12px}
-  .nav-btn{font-size:15px;padding:11px 12px}
-  .nav-icon{font-size:18px}
-  tbody td{font-size:14px;padding:12px 10px}
-  thead th{font-size:11px;padding:10px 10px}
-  .ph h1{font-size:20px}
-  .ph-sub{font-size:12px}
-  .btn{font-size:13px;padding:10px 14px}
-  .btn-sm{font-size:12px;padding:8px 12px}
-  .tab{font-size:14px;padding:10px 16px}
-  .section-title{font-size:16px}
-  .section-sub{font-size:13px}
-  .fl{font-size:11px}
-  .fi{font-size:15px;padding:11px 13px}
-  .badge{font-size:11px;padding:3px 8px}
-  .modal h2{font-size:19px}
-  .kv-k,.kv-v{font-size:14px}
-  .card-title{font-size:11px}
-  .infobox,.errbox,.successbox{font-size:13px}
-
-  /* ── Sidebar: slide in from right on mobile ── */
+  /* Hamburger: sidebar hidden by default on mobile */
   .sidebar{
     position:fixed;top:0;right:0;height:100vh;
-    width:260px;min-width:260px;
+    width:240px;min-width:240px;
     transform:translateX(100%);
     transition:transform .28s cubic-bezier(.4,0,.2,1);
     z-index:200;
     box-shadow:-4px 0 24px rgba(20,60,110,.25);
   }
   .sidebar.open{transform:translateX(0)}
-
-  /* ── Overlay behind open sidebar ── */
+  /* Overlay behind open sidebar */
   .mob-overlay{display:none;position:fixed;inset:0;background:rgba(10,30,55,.45);z-index:199;backdrop-filter:blur(2px)}
   .mob-overlay.visible{display:block}
-
-  /* ── Top mobile bar ── */
+  /* Top mobile bar */
   .mob-topbar{
     display:flex;align-items:center;justify-content:space-between;
-    position:fixed;top:0;right:0;left:0;height:56px;
+    position:fixed;top:0;right:0;left:0;height:52px;
     background:var(--sidebar);z-index:198;
-    padding:0 18px;
+    padding:0 16px;
     box-shadow:0 2px 8px rgba(20,60,110,.2);
-    /* iPhone safe area */
-    padding-top:env(safe-area-inset-top, 0px);
   }
-  .mob-topbar-title{color:#fff;font-size:17px;font-weight:700;letter-spacing:.5px}
+  .mob-topbar-title{color:#fff;font-size:16px;font-weight:700;letter-spacing:.5px}
   .mob-topbar-title span{color:#60c8ff}
-
-  /* ── Hamburger button — bigger touch target ── */
   .ham-btn{
     background:none;border:none;cursor:pointer;
-    display:flex;flex-direction:column;gap:6px;
-    padding:10px;min-width:44px;min-height:44px;
-    justify-content:center;align-items:center;
+    display:flex;flex-direction:column;gap:5px;padding:6px;
   }
-  .ham-btn span{display:block;width:24px;height:2.5px;background:#fff;border-radius:2px;transition:all .25s}
-  .ham-btn.open span:nth-child(1){transform:translateY(8.5px) rotate(45deg)}
+  .ham-btn span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .25s}
+  .ham-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
   .ham-btn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
-  .ham-btn.open span:nth-child(3){transform:translateY(-8.5px) rotate(-45deg)}
-
-  /* ── Push content below topbar + iOS safe area ── */
-  .main{padding-top:calc(56px + env(safe-area-inset-top, 0px))}
-
-  /* ── Stat grid: 1 column on very small screens ── */
-  .stat-grid-2{grid-template-columns:1fr 1fr}
-
-  /* ── Table scroll hint ── */
-  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-
-  /* ── Modals: full width on mobile ── */
-  .modal{width:100%;max-width:100%;margin:8px;max-height:92vh;overflow-y:auto}
-
-  /* ── Larger form elements for fat fingers ── */
-  select.fi{height:44px}
-  input.fi{height:44px}
-  button.btn{min-height:44px}
+  .ham-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  /* Push content down on mobile */
+  .main{padding-top:52px}
 }
 @media(min-width:821px){
   .mob-topbar,.mob-overlay,.ham-btn{display:none!important}
@@ -345,7 +296,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v26</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v24</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -401,7 +352,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v26</div>
+    <div class="logo-sub">PORTFOLIO · v24</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -892,40 +843,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
     </div>
 
-    <!-- Gist Sync -->
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-title">☁️ סנכרון בין מכשירים — GitHub Gist</div>
-      <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.7">
-        שמור את כל הנתונים ב-GitHub Gist פרטי ← יהיו זמינים גם בנייד וגם במחשב.<br>
-        <span style="font-size:12px;color:var(--t3)">הנחיות: הכנס GitHub Token עם הרשאת <code>gist</code> — ניתן ליצור ב-github.com/settings/tokens</span>
-      </div>
-      <div class="form-row-2" style="gap:10px;margin-bottom:10px">
-        <div class="fg">
-          <label class="fl">GitHub Personal Access Token</label>
-          <input class="fi" id="gistToken" type="password" placeholder="ghp_xxxxxxxxxxxx" style="direction:ltr"/>
-        </div>
-        <div class="fg">
-          <label class="fl">Gist ID (ריק = יצור חדש)</label>
-          <input class="fi" id="gistId" type="text" placeholder="יושלם אוטומטית לאחר שמירה ראשונה" style="direction:ltr"/>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-green" onclick="gistSave()">☁️ שמור ל-Gist עכשיו</button>
-        <button class="btn btn-ghost" onclick="gistLoad()">📥 טען מ-Gist</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveGistCreds()">💾 שמור פרטי חיבור</button>
-      </div>
-      <div id="gistStatus" style="margin-top:10px;font-size:12px"></div>
-    </div>
-
     <!-- System -->
     <div class="card">
-      <div class="card-title">ניהול נתונים מקומי</div>
+      <div class="card-title">ניהול נתונים</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn btn-ghost" onclick="exportAllData()">📤 ייצוא כל הנתונים (JSON)</button>
         <button class="btn btn-ghost" onclick="importAllData()">📥 ייבוא נתונים (JSON)</button>
         <button class="btn btn-red" onclick="resetAllData()">🗑 איפוס מלא</button>
       </div>
-      <div style="margin-top:12px;font-size:12px;color:var(--t3)">גרסת אפליקציה: v26 · נתונים נשמרים מקומית + Gist אם מוגדר</div>
+      <div style="margin-top:12px;font-size:12px;color:var(--t3)">גרסת אפליקציה: v10 · כל הנתונים נשמרים רק על המכשיר שלך</div>
     </div>
   </div>
 </div>
@@ -1231,7 +1157,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v26';
+const APP_VERSION = 'v24';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1240,10 +1166,8 @@ const LS = {
   set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 };
 
-const FINNHUB_DEFAULT = 'd7mg50hr01qngrvo3c1gd7mg50hr01qngrvo3c20';
-const ALPHA_DEFAULT  = 'IW1SK69NOPOEUC5O';
-const getFinnhubKey = () => LS.get('ia_finnhub_key','') || FINNHUB_DEFAULT;
-const getAlphaKey   = () => LS.get('ia_alpha_key','')  || ALPHA_DEFAULT;
+const getFinnhubKey = () => LS.get('ia_finnhub_key','');
+const getAlphaKey   = () => LS.get('ia_alpha_key','');
 const getApiKey     = () => LS.get('ia_apikey','');
 const getRates      = () => LS.get('ia_rates', {USD:3.65, EUR:4.00, GBP:4.60});
 
@@ -1581,7 +1505,6 @@ async function refreshAll(){
   renderPortfolioFull(portfolioData.filter(r=>r.list==='holdings'));
   renderWatchlistFull(portfolioData.filter(r=>r.list==='watchlist'));
   updateDashStats(portfolioData.filter(r=>r.list==='holdings'));
-  updateEmpStats(); // Refresh SDX/PLX with live prices
 
   const upd=document.getElementById('lastUpdated');
   if(upd)upd.textContent=`עודכן · ${done}/${securities.length} מחירים · ${new Date().toLocaleTimeString('he-IL')}`;
@@ -2928,117 +2851,6 @@ function updateAlertBadge(){const b=document.getElementById('alertBadge');const 
 function saveAdminFinnhubKey(){const k=document.getElementById('adminFinnhubKey').value.trim();if(!k)return;LS.set('ia_finnhub_key',k);quoteCache.clear();document.getElementById('adminKeysStatus').innerHTML='<div class="successbox">✓ Finnhub key נשמר</div>';refreshAll();}
 function saveAdminAlphaKey(){const k=document.getElementById('adminAlphaKey').value.trim();if(!k)return;LS.set('ia_alpha_key',k);histCache.clear();document.getElementById('adminKeysStatus').innerHTML='<div class="successbox">✓ Alpha Vantage key נשמר</div>';}
 function saveAdminClaudeKey(){const k=document.getElementById('adminClaudeKey').value.trim();if(!k.startsWith('sk-ant')){alert('מפתח לא תקין — צריך להתחיל ב-sk-ant');return;}LS.set('ia_apikey',k);updateApiKeyUI();document.getElementById('adminKeysStatus').innerHTML='<div class="successbox">✓ Claude key נשמר</div>';}
-// ═══════════════════════════════════════════════════════
-//  GITHUB GIST SYNC
-// ═══════════════════════════════════════════════════════
-function getGistToken(){ return LS.get('ia_gist_token',''); }
-function getGistId()   { return LS.get('ia_gist_id',''); }
-
-function saveGistCreds(){
-  const tok = document.getElementById('gistToken')?.value?.trim();
-  const gid = document.getElementById('gistId')?.value?.trim();
-  if(tok) LS.set('ia_gist_token', tok);
-  if(gid) LS.set('ia_gist_id', gid);
-  setGistStatus('✓ פרטי חיבור נשמרו', 'green');
-}
-
-function gistPayload(){
-  return {
-    securities: loadSecurities(),
-    insurance:  loadInsurance(),
-    overview:   loadOverview(),
-    journal:    loadJournal(),
-    memory:     loadMemory(),
-    empshares:  loadEmpShares(),
-    rates:      getRates(),
-    exportedAt: new Date().toISOString(),
-    version:    APP_VERSION
-  };
-}
-
-function setGistStatus(msg, color){
-  const el = document.getElementById('gistStatus');
-  if(!el) return;
-  const colors = {green:'var(--green)', red:'var(--red)', blue:'var(--blue)', gray:'var(--t3)'};
-  el.style.color = colors[color]||colors.gray;
-  el.textContent = msg;
-}
-
-async function gistSave(){
-  const token = getGistToken();
-  if(!token){ setGistStatus('⚠ חסר GitHub Token — הכנס למעלה', 'red'); return; }
-  setGistStatus('⏳ שומר ל-Gist...', 'blue');
-  const gistId = getGistId();
-  const body = {
-    description: 'InvestmentAgent data backup',
-    public: false,
-    files: { 'investment_data.json': { content: JSON.stringify(gistPayload(), null, 2) } }
-  };
-  try {
-    let url = 'https://api.github.com/gists';
-    let method = 'POST';
-    if(gistId){ url += '/'+gistId; method = 'PATCH'; }
-    const res = await fetch(url, {
-      method,
-      headers: { 'Authorization': 'token '+token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    if(!res.ok){ const e=await res.json(); setGistStatus('❌ שגיאה: '+( e.message||res.status), 'red'); return; }
-    const data = await res.json();
-    LS.set('ia_gist_id', data.id);
-    const el = document.getElementById('gistId');
-    if(el) el.value = data.id;
-    setGistStatus('✅ נשמר בהצלחה ב-Gist! ID: '+data.id, 'green');
-  } catch(e) {
-    setGistStatus('❌ שגיאת רשת: '+e.message, 'red');
-  }
-}
-
-async function gistLoad(){
-  const token = getGistToken();
-  const gistId = getGistId();
-  if(!token){ setGistStatus('⚠ חסר GitHub Token', 'red'); return; }
-  if(!gistId){ setGistStatus('⚠ חסר Gist ID — שמור קודם ממכשיר אחר', 'red'); return; }
-  if(!confirm('טען נתונים מה-Gist? הנתונים הנוכחיים יוחלפו.')) return;
-  setGistStatus('⏳ טוען מ-Gist...', 'blue');
-  try {
-    const res = await fetch('https://api.github.com/gists/'+gistId, {
-      headers: { 'Authorization': 'token '+token }
-    });
-    if(!res.ok){ setGistStatus('❌ שגיאה: '+res.status, 'red'); return; }
-    const gist = await res.json();
-    const raw = gist.files?.['investment_data.json']?.content;
-    if(!raw){ setGistStatus('❌ לא נמצא קובץ investment_data.json ב-Gist', 'red'); return; }
-    const d = JSON.parse(raw);
-    // Backup before overwrite
-    try { LS.set('ia_auto_backup', { ...gistPayload(), ts: new Date().toISOString() }); } catch(e){}
-    if(d.securities) saveSecurities(d.securities);
-    if(d.insurance)  saveInsurance(d.insurance);
-    if(d.overview)   saveOverview(d.overview);
-    if(d.journal)    saveJournal(d.journal);
-    if(d.memory)     saveMemory(d.memory);
-    if(d.empshares)  saveEmpShares(d.empshares);
-    if(d.rates)      LS.set('ia_rates', d.rates);
-    setGistStatus('✅ נטען בהצלחה! (גרסת קובץ: '+(d.version||'?')+', '+(d.exportedAt||'').slice(0,16)+')', 'green');
-    refreshAll();
-    renderInsurance();
-    renderOverview();
-    renderJournal();
-    renderEmpShares();
-  } catch(e) {
-    setGistStatus('❌ שגיאה: '+e.message, 'red');
-  }
-}
-
-function initGistUI(){
-  const tok = getGistToken();
-  const gid = getGistId();
-  const te = document.getElementById('gistToken');
-  const ge = document.getElementById('gistId');
-  if(te && tok) te.value = tok;
-  if(ge && gid) ge.value = gid;
-}
-
 function saveApiKey(){const k=document.getElementById('apiKeyInput').value.trim();if(!k.startsWith('sk-ant')){alert('מפתח לא תקין');return;}LS.set('ia_apikey',k);updateApiKeyUI();document.getElementById('apiSetupBanner').style.display='none';}
 function saveExchangeRates(){const rates={USD:parseFloat(document.getElementById('rateUSD').value)||3.65,EUR:parseFloat(document.getElementById('rateEUR').value)||4.00,GBP:parseFloat(document.getElementById('rateGBP').value)||4.60};LS.set('ia_rates',rates);document.getElementById('ratesStatus').textContent='✓ שמור';}
 
@@ -3090,7 +2902,6 @@ function showPage(name,btn){
   if(name==='alerts'){renderAlertsList();markAllRead();}
   if(name==='agent'){renderLatestAnalyses();renderMemoryPanel();updateAgentStats();}
   if(name==='insurance')renderInsurance();
-  if(name==='admin'){initGistUI();}
   if(name==='empshares'){renderEmpShares();}
   if(name==='overview')renderOverview();
   if(name==='journal')renderJournal();
