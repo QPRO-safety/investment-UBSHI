@@ -329,44 +329,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
 </script>
 </head>
-<script>
-// Early login functions — must be available before body renders
-const _LS = {
-  get:(k,d=null)=>{try{const v=localStorage.getItem(k);return v!=null?JSON.parse(v):d;}catch{return d;}},
-  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
-};
-const _DEFAULT_PWD_HASH = '830d332d8578224f';
-function hashPassword(pwd){
-  const salt='InvestAgent_2025_salt_x7k';
-  const str=salt+pwd+salt;
-  let h1=5381,h2=52711;
-  for(let i=0;i<str.length;i++){
-    const c=str.charCodeAt(i);
-    h1=((h1<<5)+h1)^c; h2=((h2<<5)+h2)^c;
-    h1=h1>>>0; h2=h2>>>0;
-  }
-  return(h1.toString(16).padStart(8,'0')+h2.toString(16).padStart(8,'0'));
-}
-function doLogin(){
-  const input=document.getElementById('loginInput');
-  const errEl=document.getElementById('loginError');
-  const pwd=input.value.trim();
-  if(!pwd){errEl.textContent='אנא הכנס סיסמה';return;}
-  if(pwd.length<4){errEl.textContent='סיסמה קצרה מדי';return;}
-  const hash=hashPassword(pwd);
-  const stored=_LS.get('ia_pwd_hash',_DEFAULT_PWD_HASH);
-  if(hash===stored){
-    _LS.set('ia_session',hash+'_'+Date.now());
-    document.getElementById('loginScreen').style.display='none';
-    if(typeof boot==='function')boot();
-  } else {
-    errEl.textContent='❌ סיסמה שגויה';
-    input.value=''; input.focus();
-    input.style.borderColor='#b52d20';
-    setTimeout(()=>input.style.borderColor='#b8d5ee',1500);
-  }
-}
-</script>
 <body>
 
 <!-- ═══════════════════ LOGIN SCREEN ═══════════════════ -->
@@ -396,7 +358,6 @@ function doLogin(){
       placeholder="הכנס סיסמה"
       maxlength="20"
       autocomplete="current-password"
-      onkeydown="if(event.key==='Enter')doLogin()"
       style="
         width:100%;padding:11px 14px;border-radius:8px;
         border:2px solid #b8d5ee;background:#fff;
@@ -410,7 +371,7 @@ function doLogin(){
       color:#b52d20;font-size:12px;margin-bottom:10px;
       min-height:18px;font-family:monospace;
     "></div>
-    <button onclick="doLogin()" style="
+    <button id="loginBtn" style="
       width:100%;padding:12px;border-radius:8px;border:none;
       background:linear-gradient(135deg,#1a3a5c,#1460ae);
       color:#fff;font-size:15px;font-weight:600;cursor:pointer;
@@ -3576,6 +3537,12 @@ function boot(){
 }
 
 function initApp(){
+  // Wire up login button and Enter key now that all JS is loaded
+  const loginBtn = document.getElementById('loginBtn');
+  const loginInput = document.getElementById('loginInput');
+  if(loginBtn)  loginBtn.addEventListener('click', doLogin);
+  if(loginInput) loginInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+
   // Check if already logged in (valid session)
   if(checkSession()){
     document.getElementById('loginScreen').style.display='none';
