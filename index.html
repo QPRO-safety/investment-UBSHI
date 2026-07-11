@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v29</title>
+<title>Investment Agent v30</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v29</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v30</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -402,7 +402,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v29</div>
+    <div class="logo-sub">PORTFOLIO · v30</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -508,10 +508,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="tbl-wrap" style="margin-bottom:24px">
       <table>
         <thead><tr>
+          <th style="width:60px"></th>
           <th>שם / טיקר</th><th>חשבון</th><th>כמות</th><th>מטבע</th>
           <th>עלות ממוצעת</th><th>מחיר כיום</th><th>שינוי יום</th>
           <th>שווי שוק</th><th>רווח/הפסד ₪</th><th>תשואה %</th>
-          <th>RSI</th><th>MA150</th><th>MA200</th><th>AI</th><th></th>
+          <th>RSI</th><th>MA150</th><th>MA200</th><th>AI</th>
         </tr></thead>
         <tbody id="holdingsBody"><tr><td colspan="15" style="text-align:center;padding:40px;color:var(--t3)">טוען...</td></tr></tbody>
       </table>
@@ -525,7 +526,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th>טיקר</th><th>הערה</th><th>מחיר כיום</th><th>שינוי יום</th>
+          <th style="width:60px"></th><th>טיקר</th><th>הערה</th><th>מחיר כיום</th><th>שינוי יום</th>
           <th>RSI</th><th>MA50</th><th>MA150</th><th>MA200</th><th>מגמה</th>
           <th>🤖 AI: מתי לקנות?</th><th>מחיר כניסה מוצע</th><th></th>
         </tr></thead>
@@ -601,6 +602,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="tbl-wrap">
       <table>
         <thead><tr>
+          <th style="width:60px"></th>
           <th>שם נייר / טיקר</th><th>ISIN</th><th>חשבון</th>
           <th>מטבע</th><th>כמות</th><th>עלות ממוצעת</th><th>מחיר כיום</th>
           <th>שווי שוק</th><th>עלות כוללת</th><th>רווח/הפסד</th><th>תשואה %</th>
@@ -626,7 +628,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th>טיקר</th><th>הערה</th><th>מחיר כיום</th><th>שינוי יום</th>
+          <th style="width:60px"></th><th>טיקר</th><th>הערה</th><th>מחיר כיום</th><th>שינוי יום</th>
           <th>RSI</th><th>MA50</th><th>MA150</th><th>MA200</th><th>מגמה</th>
           <th>🤖 AI המלצה</th><th>מחיר כניסה</th><th>סיבה להתעניינות</th><th></th>
         </tr></thead>
@@ -664,7 +666,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th>#</th><th>בעלים</th><th>סוג קופה</th><th>שם הקופה</th>
+          <th style="width:60px"></th><th>#</th><th>בעלים</th><th>סוג קופה</th><th>שם הקופה</th>
           <th>מספר עמית</th><th>שם מעביד</th><th>נזיל מיום</th>
           <th>תאריך אישור</th><th>סכום (₪)</th><th>סכום קצבתי</th>
           <th>כיסוי מוות</th><th>אובדן כושר</th><th>מסלול השקעה</th>
@@ -757,7 +759,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th>תאריך</th><th>סוג</th><th>טיקר</th><th>חשבון</th>
+          <th style="width:60px"></th><th>תאריך</th><th>סוג</th><th>טיקר</th><th>חשבון</th>
           <th>כמות</th><th>מחיר</th><th>מטבע</th><th>שווי ברוטו</th>
           <th>מס</th><th>נטו</th><th>עמלה</th><th>סיבה</th><th>יעד</th><th>סטופ</th><th>תוצאה</th><th></th>
         </tr></thead>
@@ -1145,7 +1147,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="form-row form-row-2">
       <div class="fg"><label class="fl">טיקר / שם נייר</label>
         <select class="fi" id="jTickerSelect" onchange="onJournalTickerSelect(this.value)" style="direction:ltr;display:none"></select>
-        <input class="fi" id="jTicker" placeholder="AMZN" style="direction:ltr" list="tickerList"/>
+        <input class="fi" id="jTicker" placeholder="AMZN" style="direction:ltr" list="tickerList" oninput="onJournalTickerSelect(this.value)"/>
         <datalist id="tickerList"></datalist>
       </div>
       <div class="fg"><label class="fl">מטבע</label>
@@ -1238,7 +1240,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v29';
+const APP_VERSION = 'v30';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -2169,7 +2171,12 @@ function onJournalTickerSelect(val){
   const input = document.getElementById('jTicker');
   if(input) input.value = val;
   const sec = loadSecurities().find(s=>s.ticker===val&&s.list==='holdings');
-  if(sec){ const cur=document.getElementById('jCurrency'); if(cur) cur.value=sec.currency||'USD'; }
+  if(sec){
+    const cur=document.getElementById('jCurrency'); 
+    if(cur) cur.value=sec.currency||'USD';
+    const acc=document.getElementById('jAccount');
+    if(acc && sec.account) acc.value=sec.account;
+  }
 }
 
 function openAddJournalModal(){
@@ -2278,9 +2285,11 @@ function applyBuyToPortfolio(entry){
 function applySellToPortfolio(entry){
   if(!entry.ticker||!entry.qty) return;
   const securities=loadSecurities();
-  const secIdx=securities.findIndex(s=>s.ticker===entry.ticker&&s.list==='holdings');
+  // Case-insensitive match to handle any typing variations
+  const secIdx=securities.findIndex(s=>s.ticker.toUpperCase()===entry.ticker.toUpperCase()&&s.list==='holdings');
   if(secIdx===-1){
-    console.warn('Sell: ticker not found in holdings:', entry.ticker);
+    console.warn('Sell: ticker not found in holdings:', entry.ticker, 'Available:', securities.filter(s=>s.list==='holdings').map(s=>s.ticker));
+    pushAlert(entry.ticker,'SELL_ERROR','⚠ מכירה: הטיקר '+entry.ticker+' לא נמצא בתיק ניירות הערך','red');
     return;
   }
   const sec=securities[secIdx];
@@ -3001,7 +3010,7 @@ function saveApiKey(){const k=document.getElementById('apiKeyInput').value.trim(
 function saveExchangeRates(){const rates={USD:parseFloat(document.getElementById('rateUSD').value)||3.65,EUR:parseFloat(document.getElementById('rateEUR').value)||4.00,GBP:parseFloat(document.getElementById('rateGBP').value)||4.60};LS.set('ia_rates',rates);document.getElementById('ratesStatus').textContent='✓ שמור';}
 
 function updateApiKeyUI(){
-  const hasAI=!!getApiKey(),hasFinnhub=!!LS.get('ia_finnhub_key','');
+  const hasAI=!!getApiKey(),hasFinnhub=!!getFinnhubKey();
   const dot=document.getElementById('apiDot'),label=document.getElementById('apiDotLabel');
   if(hasFinnhub&&hasAI){dot.className='api-dot on';label.textContent='הכל מחובר ✓';}
   else if(hasFinnhub){dot.className='api-dot on';label.textContent='נתונים ✓';}
