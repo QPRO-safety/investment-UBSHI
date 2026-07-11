@@ -1599,9 +1599,9 @@ async function fetchQuote(ticker){
   }catch(e){}
 
   // Fallback: use last known price from cache
-  const cached = LS.get('ia_price_cache_'+ticker, null);
-  if(cached && cached.price){
-    return {...cached, isStale:true};
+  const staleData = LS.get('ia_price_cache_'+ticker, null);
+  if(staleData && staleData.price){
+    return {...staleData, isStale:true};
   }
 
   return null;
