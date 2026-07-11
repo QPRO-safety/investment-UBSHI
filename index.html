@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v28</title>
+<title>Investment Agent v29</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v28</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v29</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -402,7 +402,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v28</div>
+    <div class="logo-sub">PORTFOLIO · v29</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -1143,7 +1143,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
     </div>
     <div class="form-row form-row-2">
-      <div class="fg"><label class="fl">טיקר / שם נייר</label><input class="fi" id="jTicker" placeholder="AMZN" style="direction:ltr"/></div>
+      <div class="fg"><label class="fl">טיקר / שם נייר</label>
+        <select class="fi" id="jTickerSelect" onchange="onJournalTickerSelect(this.value)" style="direction:ltr;display:none"></select>
+        <input class="fi" id="jTicker" placeholder="AMZN" style="direction:ltr" list="tickerList"/>
+        <datalist id="tickerList"></datalist>
+      </div>
       <div class="fg"><label class="fl">מטבע</label>
         <select class="fi" id="jCurrency"><option value="USD">USD</option><option value="ILS">ILS</option><option value="EUR">EUR</option></select>
       </div>
@@ -1234,7 +1238,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v28';
+const APP_VERSION = 'v29';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1658,8 +1662,10 @@ function renderHoldings(rows){
     const days=holdingDays(secEarliestDate(r));
     const ann=annualizedReturn(r.ret,days);
     return`<tr onclick="openDetail('${r.ticker}')">
+      <td onclick="event.stopPropagation()" style="width:60px"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditSecurityModal('${r.id}')" title="עריכה">✏</button><button class="btn btn-red btn-sm" onclick="deleteSecurity('${r.id}')" title="מחק">✕</button></div></td>
       <td><div style="font-weight:700">${r.ticker}</div><div style="font-size:11px;color:var(--t3)">${r.name||''}</div></td>
-      <td><span class="badge b-blue">${r.account||'—'}</span></td>
+      <td style="width:60px"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="editJournalEntry('${e.id}')" title="עריכה">✏</button><button class="btn btn-red btn-sm" onclick="deleteJournalEntry('${e.id}')" title="מחק">✕</button></div></td>
+            <td><span class="badge b-blue">${r.account||'—'}</span></td>
       <td class="t-mono">${r.totalQty||0}</td>
       <td><span class="badge b-gray">${r.currency}</span></td>
       <td class="t-mono">${fmtCur(r.avgCost,r.currency)}</td>
@@ -1672,7 +1678,7 @@ function renderHoldings(rows){
       <td class="t-mono" style="font-size:11px;color:var(--t2)">${a?.ma150?fmtCur(a.ma150,r.currency,0):'—'}</td>
       <td class="t-mono" style="font-size:11px;color:var(--t2)">${a?.ma200?fmtCur(a.ma200,r.currency,0):'—'}</td>
       <td id="ai-cell-${r.ticker}">${cached?renderAICell(cached.result):`<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px" onclick="event.stopPropagation();runAIForTicker('${r.ticker}')">🤖 AI</button>`}</td>
-      <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditSecurityModal('${r.id}')">✏</button><button class="btn btn-red btn-sm" onclick="deleteSecurity('${r.id}')">✕</button></div></td>
+      
     </tr>`;
   }).join('');
 }
@@ -1686,6 +1692,7 @@ function renderWatchlist(rows){
     const entryTarget=cached?.result?.key_levels?.support||null;
     const trendBadge=a?.status?`<span class="badge ${{STRONG:'b-green',OVERBOUGHT:'b-yellow',WEAK:'b-red',NEUTRAL:'b-blue'}[a.status]||'b-gray'}" style="font-size:10px">${a.status}</span>`:'—';
     return`<tr onclick="openDetail('${r.ticker}')">
+      <td onclick="event.stopPropagation()" style="width:60px"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditSecurityModal('${r.id}')" title="עריכה">✏</button><button class="btn btn-red btn-sm" onclick="deleteSecurity('${r.id}')" title="מחק">✕</button></div></td>
       <td><div style="font-weight:700">${r.ticker}</div></td>
       <td style="font-size:12px;color:var(--t2)">${r.name||'—'}</td>
       <td class="t-mono" style="font-weight:600">${r.price!=null?fmtCur(r.price,r.currency):'<span class="pulse" style="color:var(--t3)">…</span>'}</td>
@@ -1697,7 +1704,7 @@ function renderWatchlist(rows){
       <td>${trendBadge}</td>
       <td id="ai-cell-${r.ticker}">${cached?`<div style="font-weight:700;color:${aiCol}">${aiAction?.replace('_',' ')||'—'}<div style="font-size:10px;color:var(--t3);font-weight:400">${cached.result.confidence}% ביטחון</div></div>`:`<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px" onclick="event.stopPropagation();runAIForTicker('${r.ticker}')">🤖 תזמון AI</button>`}</td>
       <td class="t-mono" style="color:var(--green);font-weight:600">${entryTarget?fmtCur(entryTarget,r.currency):cached?'—':''}</td>
-      <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditSecurityModal('${r.id}')">✏</button><button class="btn btn-red btn-sm" onclick="deleteSecurity('${r.id}')">✕</button></div></td>
+      
     </tr>`;
   }).join('');
 }
@@ -1710,6 +1717,7 @@ function renderPortfolioFull(rows){
     const a=r.analysis;const days=holdingDays(secEarliestDate(r));const ann=annualizedReturn(r.ret,days);
     const layerCount=r.layers?.length||0;
     return`<tr onclick="openDetail('${r.ticker}')">
+      <td onclick="event.stopPropagation()" style="width:60px"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditSecurityModal('${r.id}')" title="עריכה">✏</button><button class="btn btn-red btn-sm" onclick="deleteSecurity('${r.id}')" title="מחק">✕</button></div></td>
       <td><div style="font-weight:700">${r.name||r.ticker}</div><div style="font-size:11px;color:var(--t3)">${r.ticker}</div></td>
       <td style="font-size:11px" class="t-mono">${r.isin||'—'}</td>
       <td><span class="badge b-blue">${r.account||'—'}</span></td>
@@ -1728,7 +1736,7 @@ function renderPortfolioFull(rows){
       <td class="t-mono" style="color:var(--green)">${r.target?fmtCur(r.target,r.currency):'—'}</td>
       <td class="t-mono" style="color:var(--red)">${r.stopLoss?fmtCur(r.stopLoss,r.currency):'—'}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openLayersModal('${r.id}')" style="font-size:11px">${layerCount} שכבות</button></td>
-      <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditSecurityModal('${r.id}')">✏</button><button class="btn btn-red btn-sm" onclick="deleteSecurity('${r.id}')">✕</button></div></td>
+      
     </tr>`;
   }).join('');
 }
@@ -1740,6 +1748,7 @@ function renderWatchlistFull(rows){
     const a=r.analysis;const cached=aiCache[r.ticker];
     const aiAction=cached?.result?.action;const aiCol=aiAction==='BUY'?'var(--green)':'var(--blue)';
     return`<tr onclick="openDetail('${r.ticker}')">
+      <td onclick="event.stopPropagation()" style="width:60px"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditSecurityModal('${r.id}')" title="עריכה">✏</button><button class="btn btn-red btn-sm" onclick="deleteSecurity('${r.id}')" title="מחק">✕</button></div></td>
       <td style="font-weight:700">${r.ticker}</td>
       <td style="font-size:12px;color:var(--t2)">${r.name||'—'}</td>
       <td class="t-mono" style="font-weight:600">${r.price!=null?fmtCur(r.price,r.currency):'…'}</td>
@@ -1752,7 +1761,7 @@ function renderWatchlistFull(rows){
       <td>${cached?`<div style="font-weight:700;color:${aiCol}">${aiAction?.replace('_',' ')||'—'}<br><span style="font-size:10px;font-weight:400;color:var(--t3)">${cached.result.confidence}%</span></div>`:`<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="event.stopPropagation();runAIForTicker('${r.ticker}')">🤖 AI</button>`}</td>
       <td class="t-mono" style="color:var(--green)">${cached?.result?.key_levels?.support?fmtCur(cached.result.key_levels.support,r.currency):'—'}</td>
       <td style="font-size:12px;color:var(--t2)">${r.watchReason||'—'}</td>
-      <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditSecurityModal('${r.id}')">✏</button><button class="btn btn-red btn-sm" onclick="deleteSecurity('${r.id}')">✕</button></div></td>
+      
     </tr>`;
   }).join('');
 }
@@ -1775,6 +1784,7 @@ function renderInsurance(){
   if(!ins.length){tbody.innerHTML='<tr><td colspan="23" style="text-align:center;padding:40px;color:var(--t3)">אין נתונים — לחץ "+ הוסף קופה"</td></tr>';return;}
   const filtered=currentInsTab==='all'?ins:currentInsTab==='liquid'?ins.filter(i=>i.type==='קרן השתלמות'||i.type==='גמל להשקעה'||i.type==='קופת גמל'):currentInsTab==='pension'?ins.filter(i=>i.type==='פנסיה'||i.type==='ביטוח מנהלים'):ins.filter(i=>i.type==='ביטוח חיים');
   tbody.innerHTML=filtered.map((ins,idx)=>`<tr>
+    <td onclick="event.stopPropagation()" style="width:60px"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="editInsurance('${ins.id}')" title="עריכה">✏</button><button class="btn btn-red btn-sm" onclick="deleteInsurance('${ins.id}')" title="מחק">✕</button></div></td>
     <td class="t-mono">${idx+1}</td>
     <td><span class="badge ${ins.owner==='אודי'?'b-blue':'b-purple'}">${ins.owner||'—'}</span></td>
     <td><span class="badge b-gray">${ins.type||'—'}</span></td>
@@ -1797,7 +1807,6 @@ function renderInsurance(){
     <td style="font-size:11px">${fmtDateHe(ins.nextUpdate)}</td>
     <td style="font-size:11px;color:var(--t2);max-width:160px;white-space:normal">${ins.details||''}</td>
     <td style="font-size:11px;color:var(--orange);max-width:160px;white-space:normal">${ins.tasks||''}</td>
-    <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="editInsurance('${ins.id}')">✏</button><button class="btn btn-red btn-sm" onclick="deleteInsurance('${ins.id}')">✕</button></div></td>
   </tr>`).join('');
 
   // Stats
@@ -1834,6 +1843,7 @@ function renderOverview(){
     totalEUR_val+=bal*1000*(r.pctEUR||0)/100;
     totalILS_val+=bal*1000*(r.pctILS||0)/100;
     return`<tr>
+      <td onclick="event.stopPropagation()" style="width:60px"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="editOverviewRow('${r.id}')" title="עריכה">✏</button><button class="btn btn-red btn-sm" onclick="deleteOverviewRow('${r.id}')" title="מחק">✕</button></div></td>
       <td class="t-mono">${i+1}</td>
       <td style="font-weight:600">${r.bank||'—'}</td>
       <td class="t-mono" style="font-size:11px">${r.account||'—'}</td>
@@ -1851,7 +1861,6 @@ function renderOverview(){
       <td class="t-mono">${r.bondGov?r.bondGov+'%':'—'}</td>
       <td class="t-mono">${r.bondCorp?r.bondCorp+'%':'—'}</td>
       <td style="font-size:11px;color:var(--t2);max-width:160px;white-space:normal">${r.notes||''}</td>
-      <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="editOverviewRow('${r.id}')">✏</button><button class="btn btn-red btn-sm" onclick="deleteOverviewRow('${r.id}')">✕</button></div></td>
     </tr>`;
   }).join('');
   document.getElementById('ovTotalILS').textContent=fmtILS(totalILS);
@@ -1899,7 +1908,6 @@ function renderJournal(){
       <td class="t-mono" style="color:var(--green)">${e.target?fmtCur(e.target,e.currency):'—'}</td>
       <td class="t-mono" style="color:var(--red)">${e.stop?fmtCur(e.stop,e.currency):'—'}</td>
       <td style="font-size:11px;color:var(--t2)">${e.outcome||'—'}</td>
-      <td><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="editJournalEntry('${e.id}')">✏</button><button class="btn btn-red btn-sm" onclick="deleteJournalEntry('${e.id}')">✕</button></div></td>
     </tr>`;
   }).join('');
 }
@@ -2151,6 +2159,20 @@ function deleteOverviewRow(id){if(!confirm('למחוק שורה זו?'))return;s
 // ═══════════════════════════════════════════════════════
 let editingJournalId=null;
 
+function populateTickerList(){
+  const securities = loadSecurities().filter(s=>s.list==='holdings');
+  const datalist = document.getElementById('tickerList');
+  if(datalist) datalist.innerHTML = securities.map(s=>'<option value="'+s.ticker+'">'+s.ticker+' — '+(s.name||'')+'</option>').join('');
+}
+
+function onJournalTickerSelect(val){
+  if(!val) return;
+  const input = document.getElementById('jTicker');
+  if(input) input.value = val;
+  const sec = loadSecurities().find(s=>s.ticker===val&&s.list==='holdings');
+  if(sec){ const cur=document.getElementById('jCurrency'); if(cur) cur.value=sec.currency||'USD'; }
+}
+
 function openAddJournalModal(){
   editingJournalId=null;
   document.getElementById('journalModalTitle').textContent='רישום עסקה';
@@ -2161,6 +2183,7 @@ function openAddJournalModal(){
   document.getElementById('jCurrency').value='USD';
   document.getElementById('journalErr').style.display='none';
   toggleSellFields('קנייה');
+  populateTickerList();
   document.getElementById('journalModal').style.display='flex';
 }
 
@@ -2214,6 +2237,10 @@ function saveJournalEntry(){
   if(!editingJournalId){
     if(type==='קנייה') applyBuyToPortfolio(data);
     if(type==='מכירה') applySellToPortfolio(data);
+  } else {
+    // When editing an existing sell entry, update the sell layer
+    if(type==='מכירה') updateSellLayer(data, editingJournalId);
+    if(type==='קנייה') updateBuyLayer(data, editingJournalId);
   }
 
   closeModal('journalModal');
@@ -2263,6 +2290,7 @@ function applySellToPortfolio(entry){
   // Add a sell layer
   sec.sellLayers.push({
     id: Date.now().toString(),
+    journalId: entry.id,
     date: entry.date,
     qty: entry.qty,
     price: entry.price,
@@ -2287,6 +2315,31 @@ function applySellToPortfolio(entry){
   }
 
   saveSecurities(securities);
+}
+
+function updateSellLayer(entry, journalId){
+  if(!entry.ticker) return;
+  const securities = loadSecurities();
+  const sec = securities.find(s=>s.ticker===entry.ticker&&s.list==='holdings');
+  if(!sec||!sec.sellLayers) return;
+  // Find sell layer by journalId match or closest date/qty
+  const idx = sec.sellLayers.findIndex(l=>l.journalId===journalId);
+  if(idx!==-1){
+    sec.sellLayers[idx] = {...sec.sellLayers[idx], qty:entry.qty, price:entry.price, tax:entry.tax||0, netAmount:entry.netAmount||0, brokerFee:entry.brokerFee||0};
+    saveSecurities(securities);
+  }
+}
+
+function updateBuyLayer(entry, journalId){
+  if(!entry.ticker) return;
+  const securities = loadSecurities();
+  const sec = securities.find(s=>s.ticker===entry.ticker&&s.list==='holdings');
+  if(!sec||!sec.layers) return;
+  const idx = sec.layers.findIndex(l=>l.journalId===journalId);
+  if(idx!==-1){
+    sec.layers[idx] = {...sec.layers[idx], qty:entry.qty, price:entry.price};
+    saveSecurities(securities);
+  }
 }
 
 function deleteJournalEntry(id){if(!confirm('למחוק עסקה זו?'))return;saveJournal(loadJournal().filter(j=>j.id!==id));renderJournal();}
@@ -3357,8 +3410,8 @@ function renderEmpShares(){
       <td class="t-mono">${r.taxYear||'—'}</td>
       <td style="font-size:11px;max-width:140px;white-space:normal;color:var(--t2)">${r.notes||''}</td>
       <td><div style="display:flex;gap:4px">
-        <button class="btn btn-ghost btn-sm" onclick="editEmpShare('${r.id}')">✏</button>
-        <button class="btn btn-red btn-sm" onclick="deleteEmpShare('${r.id}')">✕</button>
+        <button class="btn btn-ghost btn-sm" onclick="editEmpShare('${r.id}')" title="עריכה">✏</button>
+        <button class="btn btn-red btn-sm" onclick="deleteEmpShare('${r.id}')" title="מחק">✕</button>
       </div></td>
     </tr>`;
   }).join('');
