@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v30</title>
+<title>Investment Agent v31</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v30</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v31</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -402,7 +402,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v30</div>
+    <div class="logo-sub">PORTFOLIO · v31</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -509,9 +509,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <table>
         <thead><tr>
           <th style="width:60px"></th>
-          <th>שם / טיקר</th><th>חשבון</th><th>כמות</th><th>מטבע</th>
-          <th>עלות ממוצעת</th><th>מחיר כיום</th><th>שינוי יום</th>
-          <th>שווי שוק</th><th>רווח/הפסד ₪</th><th>תשואה %</th>
+          <th onclick="sortHoldings('name')" style="cursor:pointer">שם / טיקר ⇅</th><th>חשבון</th><th onclick="sortHoldings('qty')" style="cursor:pointer">כמות ⇅</th><th>מטבע</th>
+          <th>עלות ממוצעת</th><th>מחיר כיום</th><th onclick="sortHoldings('change')" style="cursor:pointer">שינוי יום ⇅</th>
+          <th onclick="sortHoldings('value')" style="cursor:pointer">שווי שוק ⇅</th><th onclick="sortHoldings('pl')" style="cursor:pointer">רווח/הפסד ₪ ⇅</th><th onclick="sortHoldings('ret')" style="cursor:pointer">תשואה % ⇅</th>
           <th>RSI</th><th>MA150</th><th>MA200</th><th>AI</th>
         </tr></thead>
         <tbody id="holdingsBody"><tr><td colspan="15" style="text-align:center;padding:40px;color:var(--t3)">טוען...</td></tr></tbody>
@@ -761,7 +761,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <thead><tr>
           <th style="width:60px"></th><th>תאריך</th><th>סוג</th><th>טיקר</th><th>חשבון</th>
           <th>כמות</th><th>מחיר</th><th>מטבע</th><th>שווי ברוטו</th>
-          <th>מס</th><th>נטו</th><th>עמלה</th><th>סיבה</th><th>יעד</th><th>סטופ</th><th>תוצאה</th><th></th>
+          <th>מס</th><th>נטו</th><th>עמלה</th><th>סיבה</th><th>יעד</th><th>סטופ</th><th>תוצאה</th>
         </tr></thead>
         <tbody id="journalBody"><tr><td colspan="14" style="text-align:center;padding:40px;color:var(--t3)">אין עסקאות — לחץ "+ רשום עסקה"</td></tr></tbody>
       </table>
@@ -1240,7 +1240,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v30';
+const APP_VERSION = 'v31';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1357,17 +1357,17 @@ function seedPortfolio() {
 //  DATA STORES
 // ═══════════════════════════════════════════════════════
 const loadSecurities  = () => LS.get('ia_securities', []);
-const saveSecurities  = (d) => LS.set('ia_securities', d);
+const saveSecurities  = (d) => { LS.set('ia_securities', d); scheduleGistSync(); };
 const loadInsurance   = () => LS.get('ia_insurance', []);
-const saveInsurance   = (d) => LS.set('ia_insurance', d);
+const saveInsurance   = (d) => { LS.set('ia_insurance', d); scheduleGistSync(); };
 const loadOverview    = () => LS.get('ia_overview', []);
-const saveOverview    = (d) => LS.set('ia_overview', d);
+const saveOverview    = (d) => { LS.set('ia_overview', d); scheduleGistSync(); };
 const loadJournal     = () => LS.get('ia_journal', []);
-const saveJournal     = (d) => LS.set('ia_journal', d);
+const saveJournal     = (d) => { LS.set('ia_journal', d); scheduleGistSync(); };
 const loadAlertsList  = () => LS.get('ia_alerts', []);
 const saveAlertsList  = (a) => LS.set('ia_alerts', a);
 const loadMemory      = () => LS.get('ia_memory', []);
-const saveMemory      = (m) => LS.set('ia_memory', m);
+const saveMemory      = (m) => { LS.set('ia_memory', m); scheduleGistSync(); };
 
 // Computed helpers for a security
 function secAvgCost(s) {
@@ -1658,6 +1658,21 @@ function rsiCol(r){if(r>75)return'var(--red)';if(r>60)return'var(--yellow)';if(r
 function renderHoldings(rows){
   const tbody=document.getElementById('holdingsBody');
   if(!rows.length){tbody.innerHTML='<tr><td colspan="15" style="text-align:center;padding:40px;color:var(--t3)">אין אחזקות</td></tr>';return;}
+  // Apply sort
+  const sortVal=(r)=>{
+    if(holdingsSortKey==='name') return (r.name||r.ticker||'').toLowerCase();
+    if(holdingsSortKey==='qty') return r.totalQty||0;
+    if(holdingsSortKey==='value') return r.marketVal||0;
+    if(holdingsSortKey==='pl') return r.pl||0;
+    if(holdingsSortKey==='ret') return r.ret||0;
+    if(holdingsSortKey==='change') return r.quote?.changePct||0;
+    return r.marketVal||0;
+  };
+  rows = rows.slice().sort((a,b)=>{
+    const av=sortVal(a),bv=sortVal(b);
+    if(typeof av==='string') return holdingsSortDir*(av<bv?-1:av>bv?1:0);
+    return holdingsSortDir*((bv||0)-(av||0));
+  });
   const aiCache_=aiCache;
   tbody.innerHTML=rows.map(r=>{
     const a=r.analysis;const cached=aiCache_[r.ticker];
@@ -1894,6 +1909,7 @@ function renderJournal(){
     const typeBadge={קנייה:'b-green',מכירה:'b-red','תוכנית כניסה':'b-blue','תוכנית יציאה':'b-yellow'}[e.type]||'b-gray';
     const total=e.qty&&e.price?e.qty*e.price:null;
     return`<tr>
+      <td style="width:60px"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="editJournalEntry('${e.id}')" title="עריכה">✏</button><button class="btn btn-red btn-sm" onclick="deleteJournalEntry('${e.id}')" title="מחק">✕</button></div></td>
       <td style="font-size:12px">${fmtDateHe(e.date)}</td>
       <td><span class="badge ${typeBadge}">${e.type}</span></td>
       <td style="font-weight:700">${e.ticker||'—'}</td>
@@ -1923,6 +1939,19 @@ function switchJournalTab(tab,btn){
 // ═══════════════════════════════════════════════════════
 //  SECURITY MODAL — ADD / EDIT with LAYERS
 // ═══════════════════════════════════════════════════════
+let holdingsSortKey = 'value';
+let holdingsSortDir = -1; // -1 = desc, 1 = asc
+
+function sortHoldings(key){
+  if(holdingsSortKey === key){
+    holdingsSortDir *= -1;
+  } else {
+    holdingsSortKey = key;
+    holdingsSortDir = -1;
+  }
+  renderHoldings(portfolioData.filter(r=>r.list==='holdings'));
+}
+
 let editingSecId=null;
 let tempLayers=[];
 
@@ -2283,6 +2312,7 @@ function applyBuyToPortfolio(entry){
 
 // Apply a sell transaction — adds a sellLayer (does NOT delete buy layers)
 function applySellToPortfolio(entry){
+  console.log('applySellToPortfolio called:', entry.ticker, entry.qty);
   if(!entry.ticker||!entry.qty) return;
   const securities=loadSecurities();
   // Case-insensitive match to handle any typing variations
@@ -2898,6 +2928,17 @@ function saveAdminClaudeKey(){const k=document.getElementById('adminClaudeKey').
 // ═══════════════════════════════════════════════════════
 //  GITHUB GIST SYNC
 // ═══════════════════════════════════════════════════════
+let _gistSyncTimer = null;
+function scheduleGistSync(){
+  // Only auto-sync if token and gist ID are configured
+  if(!getGistToken()||!getGistId()) return;
+  clearTimeout(_gistSyncTimer);
+  _gistSyncTimer = setTimeout(async()=>{
+    try{
+      await gistSave(true); // silent=true: no status message
+    }catch(e){}
+  }, 3000); // 3 second debounce
+}
 function getGistToken(){ return LS.get('ia_gist_token',''); }
 function getGistId()   { return LS.get('ia_gist_id',''); }
 
@@ -2931,10 +2972,10 @@ function setGistStatus(msg, color){
   el.textContent = msg;
 }
 
-async function gistSave(){
+async function gistSave(silent=false){
   const token = getGistToken();
-  if(!token){ setGistStatus('⚠ חסר GitHub Token — הכנס למעלה', 'red'); return; }
-  setGistStatus('⏳ שומר ל-Gist...', 'blue');
+  if(!token){ if(!silent) setGistStatus('⚠ חסר GitHub Token — הכנס למעלה', 'red'); return; }
+  if(!silent) setGistStatus('⏳ שומר ל-Gist...', 'blue');
   const gistId = getGistId();
   const body = {
     description: 'InvestmentAgent data backup',
@@ -2950,14 +2991,14 @@ async function gistSave(){
       headers: { 'Authorization': 'token '+token, 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    if(!res.ok){ const e=await res.json(); setGistStatus('❌ שגיאה: '+( e.message||res.status), 'red'); return; }
+    if(!res.ok){ const e=await res.json(); if(!silent) setGistStatus('❌ שגיאה: '+( e.message||res.status), 'red'); return; }
     const data = await res.json();
     LS.set('ia_gist_id', data.id);
     const el = document.getElementById('gistId');
     if(el) el.value = data.id;
-    setGistStatus('✅ נשמר בהצלחה ב-Gist! ID: '+data.id, 'green');
+    if(!silent) setGistStatus('✅ נשמר בהצלחה ב-Gist! ID: '+data.id, 'green');
   } catch(e) {
-    setGistStatus('❌ שגיאת רשת: '+e.message, 'red');
+    if(!silent) setGistStatus('❌ שגיאת רשת: '+e.message, 'red');
   }
 }
 
