@@ -1159,7 +1159,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
     </div>
     <div class="form-row form-row-3">
-      <div class="fg"><label class="fl">כמות</label><input class="fi" id="jQty" type="number" step="any" placeholder="10" style="direction:ltr"/></div>
+      <div class="fg"><label class="fl">כמות</label><input class="fi" id="jQty" type="number" step="any" placeholder="הכנס כמות" style="direction:ltr"/></div>
       <div class="fg"><label class="fl">מחיר</label><input class="fi" id="jPrice" type="number" step="any" placeholder="219.15" style="direction:ltr"/></div>
       <div class="fg"><label class="fl">עמלה</label><input class="fi" id="jFee" type="number" step="any" placeholder="0" style="direction:ltr"/></div>
     </div>
@@ -2263,6 +2263,12 @@ function saveJournalEntry(){
   const ticker=document.getElementById('jTicker').value.trim().toUpperCase();
   const qty=parseFloat(document.getElementById('jQty').value)||0;
   const price=parseFloat(document.getElementById('jPrice').value)||0;
+  
+  // Validate required fields
+  if(!ticker){document.getElementById('journalErr').textContent='חובה להכניס טיקר';document.getElementById('journalErr').style.display='block';return;}
+  if(!qty||qty<=0){document.getElementById('journalErr').textContent='חובה להכניס כמות גדולה מ-0';document.getElementById('journalErr').style.display='block';return;}
+  if(!price||price<=0){document.getElementById('journalErr').textContent='חובה להכניס מחיר גדול מ-0';document.getElementById('journalErr').style.display='block';return;}
+  document.getElementById('journalErr').style.display='none';
   const currency=document.getElementById('jCurrency').value;
   const isSell=(type==='מכירה');
 
@@ -3335,7 +3341,7 @@ function renderEmpShares(){
       <td style="font-size:11px;max-width:140px;white-space:normal;color:var(--t2)">${r.notes||''}</td>
       <td><div style="display:flex;gap:4px">
         <button class="btn btn-ghost btn-sm" onclick="editEmpShare('${r.id}')" title="עריכה">✏</button>
-        <button class="btn btn-red btn-sm" onclick="deleteEmpShare('${r.id}')" title="מחק">✕</button>
+        
       </div></td>
     </tr>`;
   }).join('');
