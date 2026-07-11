@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v34</title>
+<title>Investment Agent v35</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -69,7 +69,7 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:var(--fo
 /* ═══════ BUTTONS ═══════ */
 .btn{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:7px;font-size:12px;font-family:var(--font-body);font-weight:600;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
 .btn-primary{background:var(--t1);color:#fff}.btn-primary:hover{background:#2d3446}
-.btn-ghost{background:#fff;color:var(--t2);border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.05)}.btn-ghost:hover{background:var(--bg2)}
+.btn-ghost{background:#fff;color:var(--t2);border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.05)}.btn-ghost:hover{background:var(--bg2)}.btn-ghost.active{background:var(--blue);color:#fff!important;border-color:var(--blue)}
 .btn-green{background:var(--greenbg);color:var(--green);border:1px solid var(--greenborder)}.btn-green:hover{background:#d9f5ea}
 .btn-red{background:var(--redbg);color:var(--red);border:1px solid var(--redborder)}
 .btn-ai{background:var(--purplebg);color:var(--purple);border:1px solid var(--purpleborder)}
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v34</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v35</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -422,7 +422,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v34</div>
+    <div class="logo-sub">PORTFOLIO · v35</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -1298,7 +1298,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v34';
+const APP_VERSION = 'v35';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1383,14 +1383,17 @@ function seedPortfolio() {
   ];
 
   const master = [...masterHoldings, ...masterWatchlist];
-  const merged = master.map(def => {
+  // Respect user deletions — don't re-add items the user deleted
+  const deletedIds = LS.get('ia_deleted_ids', []);
+  const filteredMaster = master.filter(def => !deletedIds.includes(def.id) && !deletedIds.includes(def.ticker));
+  const merged = filteredMaster.map(def => {
     const saved = existing.find(e => e.id === def.id || e.ticker === def.ticker);
     if (saved) return { ...def, layers:saved.layers||def.layers, target:saved.target||def.target, stopLoss:saved.stopLoss||def.stopLoss, notes:saved.notes||def.notes, watchReason:saved.watchReason||def.watchReason, isin:saved.isin||def.isin, account:saved.account||def.account };
     return def;
   });
 
   // Add any user-added securities not in master
-  const userAdded = existing.filter(e => !master.find(m => m.id === e.id || m.ticker === e.ticker));
+  const userAdded = existing.filter(e => !filteredMaster.find(m => m.id === e.id || m.ticker === e.ticker));
 
   // Smart merge: preserve ALL user-entered data (target, stopLoss, notes, layers)
   const finalMerged = merged.map(s => {
@@ -1445,7 +1448,7 @@ function secEarliestDate(s) { if (!s.layers||!s.layers.length) return null; retu
 // ═══════════════════════════════════════════════════════
 const fmtILS  = (v,d=0) => v==null?'—':(v<0?'-':'')+'₪'+Math.abs(v).toLocaleString('he-IL',{minimumFractionDigits:d,maximumFractionDigits:d});
 const fmtUSD  = (v,d=2) => v==null?'—':(v<0?'-$':'$')+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
-const fmtCur  = (v,cur,d=2) => { if(v==null)return'—'; if(cur==='ILS')return fmtILS(v,d); if(cur==='EUR')return'€'+Math.abs(v).toFixed(d); return fmtUSD(v,d); };
+const fmtCur  = (v,cur,d=2) => { if(v==null)return'—'; if(cur==='ILS')return fmtILS(v,d); if(cur==='EUR')return(v<0?'-':'')+'€'+Math.abs(v).toLocaleString('en',{minimumFractionDigits:d,maximumFractionDigits:d}); return fmtUSD(v,d); };
 const fmtPct  = (v,d=2) => v==null?'—':(v>=0?'+':'')+v.toFixed(d)+'%';
 const clsPL   = (v) => v==null?'neu':v>0?'up':v<0?'dn':'neu';
 
@@ -1714,7 +1717,8 @@ function updateDashStats(held){
   const totPct=totCostILS>0?(totPL/totCostILS)*100:0;
   const dayChg=held.reduce((s,r)=>s+(r.quote?.change||0)*r.totalQty*(r.currency==='USD'?getRates().USD:r.currency==='EUR'?getRates().EUR:1),0);
   document.getElementById('statSecVal').textContent=fmtILS(totValILS);
-  document.getElementById('statSecPos').textContent=held.length+' ניירות';
+  const accLabel = currentFilterAccount==='all'?held.length+' ניירות':'חשבון '+currentFilterAccount+' · '+held.length+' ניירות';
+  document.getElementById('statSecPos').textContent=accLabel;
   const plEl=document.getElementById('statPL');plEl.textContent=fmtILS(totPL);plEl.className='stat-val '+clsPL(totPL);
   const pctEl=document.getElementById('statPLpct');pctEl.textContent=fmtPct(totPct);pctEl.className='stat-sub '+clsPL(totPct);
   const dayEl=document.getElementById('statDay');dayEl.textContent=fmtILS(dayChg);dayEl.className='stat-val '+clsPL(dayChg);
@@ -1722,14 +1726,81 @@ function updateDashStats(held){
 
 function applyAccountFilter(){
   const _h = portfolioData.filter(r=>r.list==='holdings');
+  const isEmpAcc = currentFilterAccount==='SDX'||currentFilterAccount==='PLX';
   const _f = currentFilterAccount==='all' ? _h : _h.filter(r=>r.account===currentFilterAccount);
-  renderHoldings(_f);
+
   // Update active button style
   ['all','א','ב','ג','ד','SDX','PLX'].forEach(a=>{
     const ids = {all:'filterAll','א':'filterA','ב':'filterB','ג':'filterC','ד':'filterD','SDX':'filterSDX','PLX':'filterPLX'};
     const el = document.getElementById(ids[a]);
     if(el) el.classList.toggle('active', a===currentFilterAccount);
   });
+
+  // Update dash stats label
+  const statLabel = document.querySelector('#dashStats .stat-label');
+  if(statLabel){
+    if(currentFilterAccount==='all') statLabel.textContent='שווי תיק ניירות ערך';
+    else if(isEmpAcc) statLabel.textContent='שווי מניות '+currentFilterAccount;
+    else statLabel.textContent='שווי חשבון '+currentFilterAccount;
+  }
+
+  if(isEmpAcc){
+    // Show emp shares summary instead of holdings
+    renderEmpSharesDashSummary(currentFilterAccount);
+    return;
+  }
+
+  renderHoldings(_f);
+  // Update dash stats to reflect filtered account only
+  updateDashStats(_f);
+}
+
+function renderEmpSharesDashSummary(acc){
+  const all = loadEmpShares().filter(r=>r.account===acc);
+  const rates = getRates();
+  const ticker = acc==='SDX'?'SW.PA':'PLXP.XC';
+  const quote = quoteCache.get(ticker);
+  const price = quote?.data?.price||0;
+  const totalQty = all.reduce((s,r)=>s+r.qtyVest,0);
+  const availQty = all.filter(r=>r.status==='הבשיל').reduce((s,r)=>s+r.qtyVest,0);
+  const totalEUR = availQty * price;
+  const totalILS = totalEUR * (rates.EUR||4.1);
+
+  // Update stat cards
+  const valEl = document.getElementById('statSecVal');
+  const posEl = document.getElementById('statSecPos');
+  const plEl  = document.getElementById('statPL');
+  const pctEl = document.getElementById('statPLpct');
+  const dayEl = document.getElementById('statDay');
+
+  if(valEl) valEl.textContent = price ? fmtILS(totalILS) : 'טוען...';
+  if(posEl) posEl.textContent = availQty+' יח' זמינות ל-'+totalQty+' סה"כ';
+  if(plEl)  plEl.textContent  = price ? '€'+price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+  if(pctEl) pctEl.textContent = 'מחיר '+ticker;
+  if(pctEl) pctEl.className   = 'stat-sub';
+  if(dayEl) dayEl.textContent = quote?.data?.changePct ? (quote.data.changePct>0?'+':'')+quote.data.changePct.toFixed(2)+'%' : '—';
+  if(dayEl) dayEl.className   = 'stat-val '+(quote?.data?.changePct>=0?'up':'dn');
+
+  // Show emp shares in holdings body
+  const tbody = document.getElementById('holdingsBody');
+  if(!tbody) return;
+  if(!all.length){ tbody.innerHTML='<tr><td colspan="15" style="text-align:center;padding:40px;color:var(--t3)">אין רשומות עבור '+acc+'</td></tr>'; return; }
+
+  tbody.innerHTML = all.map(r=>{
+    const val = price ? price * r.qtyVest : null;
+    const valILS = val ? val * (rates.EUR||4.1) : null;
+    const statusBadge = r.status==='הבשיל'?'b-green':r.status==='בהבשלה'?'b-yellow':'b-gray';
+    return '<tr>'
+      +'<td style="width:60px"><button class="btn btn-ghost btn-sm" onclick="editEmpShare(''+r.id+'')" title="עריכה">✏</button></td>'
+      +'<td><div style="font-weight:700">'+acc+'</div><div style="font-size:11px;color:var(--t3)">'+r.grantDate+'</div></td>'
+      +'<td colspan="2"><span class="badge '+statusBadge+'">'+r.status+'</span></td>'
+      +'<td class="t-mono">'+r.qtyVest+'</td>'
+      +'<td class="t-mono">'+fmtCur(r.grantPrice,'EUR')+'</td>'
+      +'<td class="t-mono">'+(price?fmtCur(price,'EUR'):'—')+'</td>'
+      +'<td class="t-mono">'+(valILS?fmtILS(valILS,0):'—')+'</td>'
+      +'<td colspan="7"></td>'
+      +'</tr>';
+  }).join('');
 }
 
 function filterAccount(acc){
@@ -2132,7 +2203,16 @@ function saveSecurity(){
 
 function deleteSecurity(id){
   if(!confirm('למחוק את הנייר הזה?'))return;
+  // Remember deletion so seed doesn't re-add it
+  const sec = loadSecurities().find(s=>s.id===id);
+  if(sec){
+    const deletedIds = LS.get('ia_deleted_ids',[]);
+    if(!deletedIds.includes(id)) deletedIds.push(id);
+    if(sec.ticker && !deletedIds.includes(sec.ticker)) deletedIds.push(sec.ticker);
+    LS.set('ia_deleted_ids', deletedIds);
+  }
   saveSecurities(loadSecurities().filter(s=>s.id!==id));
+  closeModal('securityModal');
   refreshAll();
 }
 
