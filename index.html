@@ -1774,7 +1774,7 @@ function renderEmpSharesDashSummary(acc){
   const dayEl = document.getElementById('statDay');
 
   if(valEl) valEl.textContent = price ? fmtILS(totalILS) : 'טוען...';
-  if(posEl) posEl.textContent = availQty+' יח' זמינות ל-'+totalQty+' סה"כ';
+  if(posEl) posEl.textContent = `${availQty} יח. זמינות מתוך ${totalQty} סה"כ`;
   if(plEl)  plEl.textContent  = price ? '€'+price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
   if(pctEl) pctEl.textContent = 'מחיר '+ticker;
   if(pctEl) pctEl.className   = 'stat-sub';
