@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v33</title>
+<title>Investment Agent v34</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v33</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v34</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -422,7 +422,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v33</div>
+    <div class="logo-sub">PORTFOLIO · v34</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -1298,7 +1298,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v33';
+const APP_VERSION = 'v34';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1567,6 +1567,7 @@ async function fetchQuote(ticker){
     const prev=meta.chartPreviousClose||price;
     const data={price,change:price-prev,changePct:prev?((price-prev)/prev)*100:0,prevClose:prev,high:meta.regularMarketDayHigh||price,low:meta.regularMarketDayLow||price};
     quoteCache.set(ticker,{data,ts:Date.now()});
+    LS.set('ia_price_cache_'+ticker,{...data,cachedAt:new Date().toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'})});
     return data;
   }catch(e){}
 
@@ -1580,6 +1581,7 @@ async function fetchQuote(ticker){
     const prev=meta.chartPreviousClose||price;
     const data={price,change:price-prev,changePct:prev?((price-prev)/prev)*100:0,prevClose:prev,high:meta.regularMarketDayHigh||price,low:meta.regularMarketDayLow||price};
     quoteCache.set(ticker,{data,ts:Date.now()});
+    LS.set('ia_price_cache_'+ticker,{...data,cachedAt:new Date().toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'})});
     return data;
   }catch(e){}
 
@@ -1594,6 +1596,7 @@ async function fetchQuote(ticker){
       const prev=meta.chartPreviousClose||price;
       const data={price,change:price-prev,changePct:prev?((price-prev)/prev)*100:0,prevClose:prev,high:meta.regularMarketDayHigh||price,low:meta.regularMarketDayLow||price};
       quoteCache.set(ticker,{data,ts:Date.now()});
+      LS.set('ia_price_cache_'+ticker,{...data,cachedAt:new Date().toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'})});
       return data;
     }
   }catch(e){}
@@ -1667,11 +1670,14 @@ async function refreshAll(){
     }catch(e){}
   }));
 
-  renderHoldings(portfolioData.filter(r=>r.list==='holdings'));
+  // Apply current account filter
+  const _h2 = portfolioData.filter(r=>r.list==='holdings');
+  const _f2 = currentFilterAccount==='all' ? _h2 : _h2.filter(r=>r.account===currentFilterAccount);
+  renderHoldings(_f2);
   renderWatchlist(portfolioData.filter(r=>r.list==='watchlist'));
-  renderPortfolioFull(portfolioData.filter(r=>r.list==='holdings'));
+  renderPortfolioFull(_h2);
   renderWatchlistFull(portfolioData.filter(r=>r.list==='watchlist'));
-  updateDashStats(portfolioData.filter(r=>r.list==='holdings'));
+  updateDashStats(_h2);
   updateEmpStats(); // Refresh SDX/PLX with live prices
 
   const upd=document.getElementById('lastUpdated');
@@ -1714,11 +1720,21 @@ function updateDashStats(held){
   const dayEl=document.getElementById('statDay');dayEl.textContent=fmtILS(dayChg);dayEl.className='stat-val '+clsPL(dayChg);
 }
 
+function applyAccountFilter(){
+  const _h = portfolioData.filter(r=>r.list==='holdings');
+  const _f = currentFilterAccount==='all' ? _h : _h.filter(r=>r.account===currentFilterAccount);
+  renderHoldings(_f);
+  // Update active button style
+  ['all','א','ב','ג','ד','SDX','PLX'].forEach(a=>{
+    const ids = {all:'filterAll','א':'filterA','ב':'filterB','ג':'filterC','ד':'filterD','SDX':'filterSDX','PLX':'filterPLX'};
+    const el = document.getElementById(ids[a]);
+    if(el) el.classList.toggle('active', a===currentFilterAccount);
+  });
+}
+
 function filterAccount(acc){
   currentFilterAccount=acc;
-  ['all','א','ב','ג'].forEach(a=>{const b=document.getElementById('filter'+({all:'All','א':'A','ב':'B','ג':'C'}[a]));if(b){b.className='btn btn-ghost btn-sm'+(a===acc?' btn-primary':'');}});
-  const filtered=currentFilterAccount==='all'?portfolioData.filter(r=>r.list==='holdings'):portfolioData.filter(r=>r.list==='holdings'&&r.account===acc);
-  renderHoldings(filtered);
+  applyAccountFilter();
 }
 
 function rsiCol(r){if(r>75)return'var(--red)';if(r>60)return'var(--yellow)';if(r<30)return'var(--blue)';return'var(--green)';}
@@ -2372,7 +2388,7 @@ function saveJournalEntry(){
     avgCost:secAvgCost(s), totalQty:secTotalQty(s), totalCost:secTotalCost(s),
     marketVal:null, price:null, pl:null, ret:null, quote:null
   }));
-  renderHoldings(portfolioData.filter(r=>r.list==='holdings'));
+  applyAccountFilter();
   renderWatchlist(portfolioData.filter(r=>r.list==='watchlist'));
   renderPortfolioFull(portfolioData.filter(r=>r.list==='holdings'));
   updateDashStats(portfolioData.filter(r=>r.list==='holdings'));
