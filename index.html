@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v32</title>
+<title>Investment Agent v33</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v32</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v33</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -367,6 +367,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         transition:border-color .2s;
       "
     />
+    <div id="totpFieldWrap" style="display:none;margin-bottom:4px">
+      <div style="text-align:right;margin-bottom:6px">
+        <label style="font-size:12px;color:#3a5470;font-weight:600">קוד מ-Google Authenticator</label>
+      </div>
+      <input
+        id="totpInput"
+        type="text"
+        inputmode="numeric"
+        maxlength="6"
+        placeholder="000000"
+        style="
+          width:100%;padding:11px 14px;border-radius:8px;
+          border:2px solid #b8d5ee;background:#fff;
+          font-size:22px;font-family:monospace;letter-spacing:.4em;
+          outline:none;box-sizing:border-box;margin-bottom:10px;
+          direction:ltr;text-align:center;
+          transition:border-color .2s;
+        "
+      />
+    </div>
     <div id="loginError" style="
       color:#b52d20;font-size:12px;margin-bottom:10px;
       min-height:18px;font-family:monospace;
@@ -402,7 +422,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v32</div>
+    <div class="logo-sub">PORTFOLIO · v33</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -897,6 +917,39 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
     </div>
 
+    <!-- TOTP 2FA -->
+    <div class="card" style="margin-bottom:16px;border-right:3px solid var(--blue)">
+      <div class="card-title">🔐 אימות דו-שלבי — Google Authenticator</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.7">
+        סרוק את ה-QR עם Google Authenticator (פעם אחת בלבד). בכל כניסה הבא יתבקש קוד 6 ספרות.
+      </div>
+      <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+        <div>
+          <img id="totpQR" src="" alt="QR Code" style="width:160px;height:160px;border:2px solid var(--border);border-radius:8px"/>
+          <div style="font-size:10px;color:var(--t3);margin-top:4px;text-align:center">סרוק עם Google Authenticator</div>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:12px;color:var(--t3);margin-bottom:8px">מפתח ידני (אם לא ניתן לסרוק):</div>
+          <div style="font-family:monospace;font-size:13px;background:var(--bg2);padding:8px 12px;border-radius:6px;letter-spacing:.1em;direction:ltr" id="totpSecretDisplay"></div>
+          <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+            <label style="font-size:13px;color:var(--t2)">אימות דו-שלבי פעיל:</label>
+            <input type="checkbox" id="totpEnabledCheck" style="width:18px;height:18px;cursor:pointer" onchange="toggleTOTP(this.checked)"/>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--t3)">
+            ⚠ אל תסגור את האפליקציה לפני שסרקת ואימתת קוד!
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <label class="fl">בדוק קוד (וודא שהסריקה עבדה):</label>
+        <div style="display:flex;gap:8px">
+          <input class="fi" id="totpTestInput" type="text" inputmode="numeric" maxlength="6" placeholder="000000" style="direction:ltr;max-width:140px;letter-spacing:.3em;font-size:18px"/>
+          <button class="btn btn-ghost" onclick="testTOTP()">בדוק ✓</button>
+        </div>
+        <div id="totpTestResult" style="margin-top:8px;font-size:13px"></div>
+      </div>
+    </div>
+
     <!-- Gist Sync -->
     <div class="card" style="margin-bottom:16px">
       <div class="card-title">☁️ סנכרון בין מכשירים — GitHub Gist</div>
@@ -1245,7 +1298,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v32';
+const APP_VERSION = 'v33';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1478,6 +1531,7 @@ async function fetchQuote(ticker){
       if(d&&d.c>0){
         const data={price:d.c,change:d.d,changePct:d.dp,high:d.h,low:d.l,prevClose:d.pc};
         quoteCache.set(ticker,{data,ts:Date.now()});
+        LS.set('ia_price_cache_'+ticker, {...data, cachedAt: new Date().toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'})});
         return data;
       }
     }catch(e){}
@@ -1495,6 +1549,7 @@ async function fetchQuote(ticker){
         const price=parseFloat(q['05. price']),prev=parseFloat(q['08. previous close'])||price;
         const data={price,prevClose:prev,change:price-prev,changePct:prev?((price-prev)/prev)*100:0,high:parseFloat(q['03. high']),low:parseFloat(q['04. low'])};
         quoteCache.set(ticker,{data,ts:Date.now()});
+        LS.set('ia_price_cache_'+ticker, {...data, cachedAt: new Date().toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'})});
         return data;
       }
     }
@@ -1543,6 +1598,12 @@ async function fetchQuote(ticker){
     }
   }catch(e){}
 
+  // Fallback: use last known price from cache
+  const cached = LS.get('ia_price_cache_'+ticker, null);
+  if(cached && cached.price){
+    return {...cached, isStale:true};
+  }
+
   return null;
 }
 
@@ -1581,7 +1642,7 @@ async function refreshAll(){
   // Show data immediately with static values
   portfolioData=securities.map(s=>({
     ...s,
-    avgCost:secAvgCost(s), totalQty:secTotalQty(s), totalCost:secTotalCost(s),
+    avgCost:secAvgCost(s), totalQty:secTotalQty(s), totalCost:secTotalCost(s), cachedAt:null, isStale:false,
     price:null, quote:null, hist:null, analysis:null, marketVal:null, pl:null, ret:null
   }));
   renderHoldings(portfolioData.filter(r=>r.list==='holdings'));
@@ -1601,7 +1662,7 @@ async function refreshAll(){
       const mv=price!=null?price*qty:null;
       const pl=mv!=null?toILS(mv,s.currency)-toILS(cost,s.currency):null;
       const ret=cost>0&&price!=null?((price-avg)/avg)*100:null;
-      portfolioData[idx]={...portfolioData[idx],quote:q,price,avgCost:avg,totalQty:qty,totalCost:cost,marketVal:mv,pl,ret};
+      const staleInfo = q?.isStale ? {isStale:true, cachedAt:q.cachedAt||''} : {isStale:false, cachedAt:null}; portfolioData[idx]={...portfolioData[idx],quote:q,price,avgCost:avg,totalQty:qty,totalCost:cost,marketVal:mv,pl,ret,...staleInfo};
       done++;
     }catch(e){}
   }));
@@ -1692,7 +1753,7 @@ function renderHoldings(rows){
       <td class="t-mono">${r.totalQty||0}</td>
       <td><span class="badge b-gray">${r.currency}</span></td>
       <td class="t-mono">${fmtCur(r.avgCost,r.currency)}</td>
-      <td class="t-mono" style="font-weight:600">${r.price!=null?fmtCur(r.price,r.currency):'<span class="pulse" style="color:var(--t3)">…</span>'}</td>
+      <td class="t-mono" style="font-weight:600">${r.price!=null?(fmtCur(r.price,r.currency)+(r.isStale?'<div style="font-size:9px;color:var(--t3)">'+r.cachedAt+'</div>':'')):'<span class="pulse" style="color:var(--t3)">…</span>'}</td>
       <td class="t-mono ${clsPL(r.quote?.changePct)}">${fmtPct(r.quote?.changePct)}</td>
       <td class="t-mono">${r.marketVal!=null?fmtCur(r.marketVal,r.currency,0):'—'}</td>
       <td><div class="t-mono ${clsPL(r.pl)}" style="font-weight:600">${fmtILS(r.pl,0)}</div>${ann?`<div style="font-size:10px;color:var(--t3)">${ann}%/שנה</div>`:''}</td>
@@ -3073,6 +3134,36 @@ async function gistLoad(){
   }
 }
 
+function initTOTPUI(){
+  const secret = LS.get('ia_totp_secret', TOTP_SECRET);
+  const issuer = 'InvestAgent';
+  const account = 'UDI';
+  const otpauth = `otpauth://totp/${issuer}:${account}?secret=${secret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
+  const qrUrl = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=${encodeURIComponent(otpauth)}`;
+  const qrEl = document.getElementById('totpQR');
+  if(qrEl) qrEl.src = qrUrl;
+  const secEl = document.getElementById('totpSecretDisplay');
+  if(secEl) secEl.textContent = secret;
+  const chk = document.getElementById('totpEnabledCheck');
+  if(chk) chk.checked = LS.get('ia_totp_enabled', true);
+}
+
+function toggleTOTP(enabled){
+  LS.set('ia_totp_enabled', enabled);
+  const msg = enabled ? '✅ אימות דו-שלבי פעיל' : '⚠ אימות דו-שלבי כבוי';
+  document.getElementById('totpTestResult').textContent = msg;
+  document.getElementById('totpTestResult').style.color = enabled ? 'var(--green)' : 'var(--yellow)';
+}
+
+async function testTOTP(){
+  const code = document.getElementById('totpTestInput').value.trim();
+  const res = document.getElementById('totpTestResult');
+  if(!code||code.length!==6){ res.textContent='הכנס קוד בן 6 ספרות'; res.style.color='var(--red)'; return; }
+  const ok = await verifyTOTP(code);
+  res.textContent = ok ? '✅ קוד תקין! הסריקה עבדה.' : '❌ קוד שגוי — נסה שוב';
+  res.style.color = ok ? 'var(--green)' : 'var(--red)';
+}
+
 function initGistUI(){
   const tok = getGistToken();
   const gid = getGistId();
@@ -3133,7 +3224,7 @@ function showPage(name,btn){
   if(name==='alerts'){renderAlertsList();markAllRead();}
   if(name==='agent'){renderLatestAnalyses();renderMemoryPanel();updateAgentStats();}
   if(name==='insurance')renderInsurance();
-  if(name==='admin'){initGistUI();}
+  if(name==='admin'){initGistUI();initTOTPUI();}
   if(name==='empshares'){
     renderEmpShares();
     // Fetch live prices for SDX and PLX
@@ -3161,6 +3252,48 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelec
 // Default password hash — change by setting 'ia_pwd_hash' in localStorage
 // Default password: Udi123  (SHA-256 hash stored)
 const DEFAULT_PWD_HASH = 'f2bb372d15ca1e4f'; // UDI123
+const TOTP_SECRET = 'WNUGLHIGZ3OTRMPCL4HLD4BI46ZAIV2W'; // Google Authenticator secret
+const TOTP_ENABLED_DEFAULT = true;
+
+// ── TOTP Implementation (RFC 6238) ──
+function base32Decode(s){
+  const a='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let b=0,bits=0,out=[];
+  for(const c of s.toUpperCase()){
+    const v=a.indexOf(c);
+    if(v<0)continue;
+    b=(b<<5)|v; bits+=5;
+    if(bits>=8){bits-=8;out.push((b>>bits)&0xFF);}
+  }
+  return new Uint8Array(out);
+}
+
+async function totpCode(secret, t){
+  t=t||Math.floor(Date.now()/1000/30);
+  const key=base32Decode(secret);
+  const msg=new Uint8Array(8);
+  for(let i=7;i>=0;i--){msg[i]=t&0xFF;t>>=8;}
+  const k=await crypto.subtle.importKey('raw',key,{name:'HMAC',hash:'SHA-1'},false,['sign']);
+  const sig=new Uint8Array(await crypto.subtle.sign('HMAC',k,msg));
+  const o=sig[19]&0xF;
+  const n=((sig[o]&0x7F)<<24)|((sig[o+1]&0xFF)<<16)|((sig[o+2]&0xFF)<<8)|(sig[o+3]&0xFF);
+  return String(n%1000000).padStart(6,'0');
+}
+
+async function verifyTOTP(inputCode){
+  const secret = LS.get('ia_totp_secret', TOTP_SECRET);
+  const t = Math.floor(Date.now()/1000/30);
+  // Check current window and ±1 for clock drift
+  for(const delta of [0,-1,1]){
+    const code = await totpCode(secret, t+delta);
+    if(code===inputCode.trim()) return true;
+  }
+  return false;
+}
+
+function isTOTPEnabled(){
+  return LS.get('ia_totp_enabled', TOTP_ENABLED_DEFAULT);
+}
 
 // Simple hash — works on iPhone, file://, http:// everywhere
 // No crypto.subtle dependency
@@ -3180,6 +3313,8 @@ function hashPassword(pwd){
   return (h1.toString(16).padStart(8,'0') + h2.toString(16).padStart(8,'0'));
 }
 
+let _loginPwdHash = '';
+
 function doLogin(){
   const input = document.getElementById('loginInput');
   const errEl = document.getElementById('loginError');
@@ -3191,17 +3326,50 @@ function doLogin(){
   const hash = hashPassword(pwd);
   const storedHash = LS.get('ia_pwd_hash', DEFAULT_PWD_HASH);
 
-  if(hash === storedHash){
-    LS.set('ia_session', hash + '_' + Date.now());
-    document.getElementById('loginScreen').style.display = 'none';
-    errEl.textContent = '';
-    boot();
-  } else {
+  if(hash !== storedHash){
     errEl.textContent = '❌ סיסמה שגויה';
     input.value = '';
     input.focus();
     input.style.borderColor = '#b52d20';
     setTimeout(()=>input.style.borderColor='#b8d5ee', 1500);
+    return;
+  }
+
+  // Password OK — check TOTP
+  const totpEnabled = LS.get('ia_totp_enabled', true);
+  if(!totpEnabled){
+    LS.set('ia_session', hash + '_' + Date.now());
+    document.getElementById('loginScreen').style.display = 'none';
+    errEl.textContent = '';
+    boot();
+    return;
+  }
+
+  // Show TOTP field
+  _loginPwdHash = hash;
+  document.getElementById('totpFieldWrap').style.display = 'block';
+  document.getElementById('totpInput').focus();
+  input.disabled = true;
+  errEl.textContent = '';
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = 'אמת קוד →';
+  btn.onclick = doLoginTOTP;
+}
+
+async function doLoginTOTP(){
+  const errEl = document.getElementById('loginError');
+  const code = document.getElementById('totpInput').value.trim();
+  if(!code||code.length!==6){ errEl.textContent='הכנס קוד בן 6 ספרות'; return; }
+  const ok = await verifyTOTP(code);
+  if(ok){
+    LS.set('ia_session', _loginPwdHash + '_' + Date.now());
+    document.getElementById('loginScreen').style.display = 'none';
+    errEl.textContent = '';
+    boot();
+  } else {
+    errEl.textContent = '❌ קוד שגוי — נסה שוב';
+    document.getElementById('totpInput').value = '';
+    document.getElementById('totpInput').focus();
   }
 }
 
@@ -3532,6 +3700,8 @@ function initApp(){
   const loginInput = document.getElementById('loginInput');
   if(loginBtn)  loginBtn.addEventListener('click', doLogin);
   if(loginInput) loginInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  const totpInput = document.getElementById('totpInput');
+  if(totpInput) totpInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doLoginTOTP(); });
 
   // Check if already logged in (valid session)
   if(checkSession()){
