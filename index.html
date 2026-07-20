@@ -1790,16 +1790,16 @@ function renderEmpSharesDashSummary(acc){
     const val = price ? price * r.qtyVest : null;
     const valILS = val ? val * (rates.EUR||4.1) : null;
     const statusBadge = r.status==='הבשיל'?'b-green':r.status==='בהבשלה'?'b-yellow':'b-gray';
-    return '<tr>'
-      +'<td style="width:60px"><button class="btn btn-ghost btn-sm" onclick="editEmpShare(''+r.id+'')" title="עריכה">✏</button></td>'
-      +'<td><div style="font-weight:700">'+acc+'</div><div style="font-size:11px;color:var(--t3)">'+r.grantDate+'</div></td>'
-      +'<td colspan="2"><span class="badge '+statusBadge+'">'+r.status+'</span></td>'
-      +'<td class="t-mono">'+r.qtyVest+'</td>'
-      +'<td class="t-mono">'+fmtCur(r.grantPrice,'EUR')+'</td>'
-      +'<td class="t-mono">'+(price?fmtCur(price,'EUR'):'—')+'</td>'
-      +'<td class="t-mono">'+(valILS?fmtILS(valILS,0):'—')+'</td>'
-      +'<td colspan="7"></td>'
-      +'</tr>';
+    return `<tr>
+      <td style="width:60px"><button class="btn btn-ghost btn-sm" onclick="editEmpShare('${r.id}')" title="עריכה">✏</button></td>
+      <td><div style="font-weight:700">${acc}</div><div style="font-size:11px;color:var(--t3)">${r.grantDate||''}</div></td>
+      <td colspan="2"><span class="badge ${statusBadge}">${r.status||''}</span></td>
+      <td class="t-mono">${r.qtyVest}</td>
+      <td class="t-mono">${fmtCur(r.grantPrice,'EUR')}</td>
+      <td class="t-mono">${price?fmtCur(price,'EUR'):'—'}</td>
+      <td class="t-mono">${valILS?fmtILS(valILS,0):'—'}</td>
+      <td colspan="7"></td>
+    </tr>`;
   }).join('');
 }
 
