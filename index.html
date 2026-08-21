@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v36</title>
+<title>Investment Agent v37</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v36</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v37</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -422,7 +422,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v36</div>
+    <div class="logo-sub">PORTFOLIO · v37</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -529,9 +529,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <table>
         <thead><tr>
           <th style="width:60px"></th>
-          <th onclick="sortHoldings('name')" style="cursor:pointer">שם / טיקר ⇅</th><th>חשבון</th><th onclick="sortHoldings('qty')" style="cursor:pointer">כמות ⇅</th><th>מטבע</th>
-          <th>עלות ממוצעת</th><th>מחיר כיום</th><th onclick="sortHoldings('value')" style="cursor:pointer">שווי שוק ⇅</th><th onclick="sortHoldings('dayChange')" style="cursor:pointer">שינוי יום ⇅</th><th onclick="sortHoldings('plNative')" style="cursor:pointer">רווח/הפסד ⇅</th><th onclick="sortHoldings('pl')" style="cursor:pointer">רווח/הפסד ₪ ⇅</th><th onclick="sortHoldings('ret')" style="cursor:pointer">תשואה % ⇅</th>
-          <th>RSI</th><th>MA150</th><th>MA200</th><th>AI</th>
+          <th onclick="sortHoldings('name')" style="cursor:pointer">שם / טיקר ⇅</th>
+          <th onclick="sortHoldings('account')" style="cursor:pointer">חשבון ⇅</th>
+          <th onclick="sortHoldings('qty')" style="cursor:pointer">כמות ⇅</th>
+          <th onclick="sortHoldings('currency')" style="cursor:pointer">מטבע ⇅</th>
+          <th onclick="sortHoldings('avg')" style="cursor:pointer">עלות ממוצעת ⇅</th>
+          <th onclick="sortHoldings('price')" style="cursor:pointer">מחיר כיום ⇅</th>
+          <th onclick="sortHoldings('dayChange')" style="cursor:pointer">שינוי יום ⇅</th>
+          <th onclick="sortHoldings('value')" style="cursor:pointer">שווי שוק ⇅</th>
+          <th onclick="sortHoldings('plNative')" style="cursor:pointer">רווח/הפסד ⇅</th>
+          <th onclick="sortHoldings('pl')" style="cursor:pointer">רווח/הפסד ₪ ⇅</th>
+          <th onclick="sortHoldings('ret')" style="cursor:pointer">תשואה % ⇅</th>
+          <th onclick="sortHoldings('rsi')" style="cursor:pointer">RSI ⇅</th>
+          <th>MA150</th><th>MA200</th><th>AI</th>
         </tr></thead>
         <tbody id="holdingsBody"><tr><td colspan="15" style="text-align:center;padding:40px;color:var(--t3)">טוען...</td></tr></tbody>
       </table>
@@ -622,11 +632,24 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <table>
         <thead><tr>
           <th style="width:60px"></th>
-          <th>שם נייר / טיקר</th><th>ISIN</th><th>חשבון</th>
-          <th>מטבע</th><th>כמות</th><th>עלות ממוצעת</th><th>מחיר כיום</th>
-          <th>שווי שוק</th><th>עלות כוללת</th><th>רווח/הפסד</th><th>תשואה %</th>
-          <th>תשואה שנתית</th><th>MA150</th><th>MA200</th><th>RSI</th>
-          <th>יעד מכירה</th><th>סטופ לוס</th><th>שכבות</th><th></th>
+          <th onclick="sortPortfolio('name')" style="cursor:pointer">טיקר / שם נייר ⇅</th>
+          <th onclick="sortPortfolio('isin')" style="cursor:pointer">ISIN ⇅</th>
+          <th onclick="sortPortfolio('account')" style="cursor:pointer">חשבון ⇅</th>
+          <th onclick="sortPortfolio('currency')" style="cursor:pointer">מטבע ⇅</th>
+          <th onclick="sortPortfolio('qty')" style="cursor:pointer">כמות ⇅</th>
+          <th onclick="sortPortfolio('avg')" style="cursor:pointer">עלות ממוצעת ⇅</th>
+          <th onclick="sortPortfolio('price')" style="cursor:pointer">מחיר כיום ⇅</th>
+          <th onclick="sortPortfolio('value')" style="cursor:pointer">שווי שוק ⇅</th>
+          <th onclick="sortPortfolio('cost')" style="cursor:pointer">עלות כוללת ⇅</th>
+          <th onclick="sortPortfolio('pl')" style="cursor:pointer">רווח/הפסד ⇅</th>
+          <th onclick="sortPortfolio('ret')" style="cursor:pointer">תשואה % ⇅</th>
+          <th onclick="sortPortfolio('ann')" style="cursor:pointer">תשואה שנתית ⇅</th>
+          <th onclick="sortPortfolio('ma150')" style="cursor:pointer">MA150 ⇅</th>
+          <th>MA200</th>
+          <th onclick="sortPortfolio('rsi')" style="cursor:pointer">RSI ⇅</th>
+          <th onclick="sortPortfolio('target')" style="cursor:pointer">יעד מכירה ⇅</th>
+          <th onclick="sortPortfolio('stop')" style="cursor:pointer">סטופ לוס ⇅</th>
+          <th>שכבות</th><th></th>
         </tr></thead>
         <tbody id="portfolioFullBody"><tr><td colspan="20" style="text-align:center;padding:40px;color:var(--t3)">טוען...</td></tr></tbody>
       </table>
@@ -731,11 +754,22 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th>סוג</th><th>כמות מקורית</th><th>כמות הבשלה</th>
-          <th>תאריך הקצאה</th><th>תאריך הבשלה</th><th>סטטוס</th>
-          <th>מחיר הבשלה (€)</th><th>שווי הטבה (€)</th><th>שער חליפין</th>
-          <th>מס בתלוש (₪)</th><th>תאריך מכירה</th><th>תמורה נטו (€)</th>
-          <th>רווח הון (€)</th><th>רווח הון (₪)</th><th>שנת מס</th><th>הערות</th><th></th>
+          <th onclick="sortEmpShares('type')" style="cursor:pointer">סוג ⇅</th>
+          <th onclick="sortEmpShares('qtyOrig')" style="cursor:pointer">כמות מקורית ⇅</th>
+          <th onclick="sortEmpShares('qtyVest')" style="cursor:pointer">כמות הבשלה ⇅</th>
+          <th onclick="sortEmpShares('grantDate')" style="cursor:pointer">תאריך הקצאה ⇅</th>
+          <th onclick="sortEmpShares('vestDate')" style="cursor:pointer">תאריך הבשלה ⇅</th>
+          <th onclick="sortEmpShares('status')" style="cursor:pointer">סטטוס ⇅</th>
+          <th onclick="sortEmpShares('vestPrice')" style="cursor:pointer">מחיר הבשלה ⇅</th>
+          <th onclick="sortEmpShares('benefit')" style="cursor:pointer">הטבה ⇅</th>
+          <th onclick="sortEmpShares('exRate')" style="cursor:pointer">שע"ח ⇅</th>
+          <th onclick="sortEmpShares('taxILS')" style="cursor:pointer">מס ₪ ⇅</th>
+          <th onclick="sortEmpShares('saleDate')" style="cursor:pointer">תאריך מכירה ⇅</th>
+          <th onclick="sortEmpShares('saleNet')" style="cursor:pointer">נטו מכירה ⇅</th>
+          <th onclick="sortEmpShares('capGainEUR')" style="cursor:pointer">רווח הון EUR ⇅</th>
+          <th onclick="sortEmpShares('capGainILS')" style="cursor:pointer">רווח הון ₪ ⇅</th>
+          <th onclick="sortEmpShares('taxYear')" style="cursor:pointer">שנת מס ⇅</th>
+          <th>הערות</th><th style="width:60px"></th>
         </tr></thead>
         <tbody id="empSharesBody">
           <tr><td colspan="17" style="text-align:center;padding:40px;color:var(--t3)">טוען...</td></tr>
@@ -1297,7 +1331,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v36';
+const APP_VERSION = 'v37';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1751,7 +1785,7 @@ async function refreshAll(){
     avgCost:secAvgCost(s), totalQty:secTotalQty(s), totalCost:secTotalCost(s), cachedAt:null, isStale:false,
     price:null, quote:null, hist:null, analysis:null, marketVal:null, pl:null, ret:null
   }));
-  renderHoldings(portfolioData.filter(r=>r.list==='holdings'));
+  applyAccountFilter();
   renderWatchlist(portfolioData.filter(r=>r.list==='watchlist'));
   renderPortfolioFull(portfolioData.filter(r=>r.list==='holdings'));
   renderWatchlistFull(portfolioData.filter(r=>r.list==='watchlist'));
@@ -1768,13 +1802,14 @@ async function refreshAll(){
       const mv=price!=null?price*qty:null;
       const rates=getRates();
       const curRate=s.currency==='EUR'?(rates.EUR||4.0):s.currency==='GBP'?(rates.GBP||4.6):(rates.USD||3.65);
-      // 3 P&L values:
-      const plNative=calcPlNative(s,price);                  // רווח/הפסד במטבע המניה
-      const plILS=calcPlILS(s,price,curRate);                // רווח/הפסד בש"ח (שער קנייה vs שער היום)
-      const pl=plILS;                                         // backward compat
-      const ret=cost>0&&price!=null?((price-avg)/avg)*100:null;
+      // P&L: use avgCost × remainingQty (not total bought cost)
+      const remainingCost = avg * qty; // cost of remaining shares only
+      const plNative = price!=null ? (price-avg)*qty : null;          // רווח/הפסד במטבע המניה
+      const plILS    = plNative!=null ? plNative*curRate : null;       // רווח/הפסד בש"ח
+      const pl       = plILS;
+      const ret      = avg>0&&price!=null?((price-avg)/avg)*100:null;
       const staleInfo = q?.isStale ? {isStale:true, cachedAt:q.cachedAt||''} : {isStale:false, cachedAt:null};
-      portfolioData[idx]={...portfolioData[idx],quote:q,price,avgCost:avg,totalQty:qty,totalCost:cost,marketVal:mv,pl,plNative,plILS,ret,...staleInfo};
+      portfolioData[idx]={...portfolioData[idx],quote:q,price,avgCost:avg,totalQty:qty,totalCost:remainingCost,marketVal:mv,pl,plNative,plILS,ret,...staleInfo};
       done++;
     }catch(e){}
   }));
@@ -1922,12 +1957,17 @@ function renderHoldings(rows){
   // Apply sort
   const sortVal=(r)=>{
     if(holdingsSortKey==='name') return (r.name||r.ticker||'').toLowerCase();
+    if(holdingsSortKey==='account') return (r.account||'').toLowerCase();
     if(holdingsSortKey==='qty') return r.totalQty||0;
+    if(holdingsSortKey==='currency') return (r.currency||'').toLowerCase();
+    if(holdingsSortKey==='avg') return r.avgCost||0;
+    if(holdingsSortKey==='price') return r.price||0;
     if(holdingsSortKey==='value') return r.marketVal||0;
     if(holdingsSortKey==='dayChange') return (r.quote?.change||0)*(r.totalQty||0);
     if(holdingsSortKey==='plNative') return r.plNative||0;
     if(holdingsSortKey==='pl') return r.pl||0;
     if(holdingsSortKey==='ret') return r.ret||0;
+    if(holdingsSortKey==='rsi') return r.analysis?.rsi||0;
     if(holdingsSortKey==='change') return r.quote?.changePct||0;
     return r.marketVal||0;
   };
@@ -1993,12 +2033,36 @@ function renderPortfolioFull(rows){
   const tbody=document.getElementById('portfolioFullBody');if(!tbody)return;
   const filtered=currentPortfolioTab==='all'?rows:rows.filter(r=>r.account===currentPortfolioTab);
   if(!filtered.length){tbody.innerHTML='<tr><td colspan="19" style="text-align:center;padding:40px;color:var(--t3)">אין ניירות</td></tr>';return;}
+  // Apply sort
+  const pSortVal=(r)=>{
+    if(portfolioSortKey==='name') return (r.name||r.ticker||'').toLowerCase();
+    if(portfolioSortKey==='isin') return (r.isin||'').toLowerCase();
+    if(portfolioSortKey==='account') return (r.account||'').toLowerCase();
+    if(portfolioSortKey==='currency') return (r.currency||'').toLowerCase();
+    if(portfolioSortKey==='qty') return r.totalQty||0;
+    if(portfolioSortKey==='avg') return r.avgCost||0;
+    if(portfolioSortKey==='price') return r.price||0;
+    if(portfolioSortKey==='value') return r.marketVal||0;
+    if(portfolioSortKey==='cost') return r.totalCost||0;
+    if(portfolioSortKey==='pl') return r.pl||0;
+    if(portfolioSortKey==='ret') return r.ret||0;
+    if(portfolioSortKey==='ma150') return r.analysis?.ma150||0;
+    if(portfolioSortKey==='rsi') return r.analysis?.rsi||0;
+    if(portfolioSortKey==='target') return r.target||0;
+    if(portfolioSortKey==='stop') return r.stopLoss||0;
+    return (r.name||r.ticker||'').toLowerCase();
+  };
+  filtered.sort((a,b)=>{
+    const av=pSortVal(a),bv=pSortVal(b);
+    if(typeof av==='string') return portfolioSortDir*(av<bv?-1:av>bv?1:0);
+    return portfolioSortDir*((bv||0)-(av||0));
+  });
   tbody.innerHTML=filtered.map(r=>{
     const a=r.analysis;const days=holdingDays(secEarliestDate(r));const ann=annualizedReturn(r.ret,days);
     const layerCount=r.layers?.length||0;
     return`<tr onclick="openDetail('${r.ticker}')">
       <td onclick="event.stopPropagation()" style="width:60px"><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="openEditSecurityModal('${r.id}')" title="עריכה">✏</button></div></td>
-      <td><div style="font-weight:700">${r.name||r.ticker}</div><div style="font-size:11px;color:var(--t3)">${r.ticker}</div></td>
+      <td><div style="font-weight:700;direction:ltr">${r.ticker}</div><div style="font-size:11px;color:var(--t3)">${r.name||''}</div></td>
       <td style="font-size:11px" class="t-mono">${r.isin||'—'}</td>
       <td><span class="badge b-blue">${r.account||'—'}</span></td>
       <td><span class="badge b-gray">${r.currency}</span></td>
@@ -2205,6 +2269,10 @@ function switchJournalTab(tab,btn){
 // ═══════════════════════════════════════════════════════
 let holdingsSortKey = 'value';
 let holdingsSortDir = -1; // -1 = desc, 1 = asc
+let portfolioSortKey = 'name';
+let portfolioSortDir = 1;
+let empSortKey = 'vestDate';
+let empSortDir = 1;
 
 function sortHoldings(key){
   if(holdingsSortKey === key){
@@ -2213,7 +2281,19 @@ function sortHoldings(key){
     holdingsSortKey = key;
     holdingsSortDir = -1;
   }
-  renderHoldings(portfolioData.filter(r=>r.list==='holdings'));
+  applyAccountFilter();
+}
+
+function sortPortfolio(key){
+  if(portfolioSortKey===key) portfolioSortDir*=-1;
+  else { portfolioSortKey=key; portfolioSortDir=1; }
+  renderPortfolioFull(portfolioData.filter(r=>r.list==='holdings'));
+}
+
+function sortEmpShares(key){
+  if(empSortKey===key) empSortDir*=-1;
+  else { empSortKey=key; empSortDir=1; }
+  renderEmpShares();
 }
 
 let editingSecId=null;
@@ -3678,8 +3758,12 @@ function renderEmpShares(){
   const tbody = document.getElementById('empSharesBody');
   if(!tbody) return;
 
-  // Sort by grant date
-  rows.sort((a,b)=>a.grantDate>b.grantDate?1:-1);
+  // Apply sort
+  rows.sort((a,b)=>{
+    const av=a[empSortKey]||'', bv=b[empSortKey]||'';
+    if(typeof av==='string') return empSortDir*(av<bv?-1:av>bv?1:0);
+    return empSortDir*((bv||0)-(av||0));
+  });
 
   const statusBadge = (s) => {
     const map = {'הבשיל':'b-green','נמכר':'b-gray','טרם הבשיל':'b-yellow','בוטל':'b-red'};
@@ -3696,6 +3780,7 @@ function renderEmpShares(){
     const isCancelled = r.status==='בוטל';
     const rowStyle = isFuture?'background:var(--yellowbg)':isCancelled?'opacity:.5':'';
     return `<tr style="${rowStyle}">
+      <td style="width:60px"><button class="btn btn-ghost btn-sm" onclick="editEmpShare('${r.id}')" title="עריכה">✏</button></td>
       <td><span class="badge b-blue" style="font-size:10px">${r.type}</span></td>
       <td class="t-mono">${r.qtyOrig||0}</td>
       <td class="t-mono" style="font-weight:600">${r.qtyVest||0}</td>
@@ -3712,10 +3797,6 @@ function renderEmpShares(){
       <td class="t-mono ${r.capGainILS>0?'up':r.capGainILS<0?'dn':''}">${r.capGainILS?fmtILS(r.capGainILS,0):'—'}</td>
       <td class="t-mono">${r.taxYear||'—'}</td>
       <td style="font-size:11px;max-width:140px;white-space:normal;color:var(--t2)">${r.notes||''}</td>
-      <td><div style="display:flex;gap:4px">
-        <button class="btn btn-ghost btn-sm" onclick="editEmpShare('${r.id}')" title="עריכה">✏</button>
-        
-      </div></td>
     </tr>`;
   }).join('');
 
