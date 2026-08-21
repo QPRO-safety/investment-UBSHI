@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v35</title>
+<title>Investment Agent v36</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v35</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v36</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -422,7 +422,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v35</div>
+    <div class="logo-sub">PORTFOLIO · v36</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -530,8 +530,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <thead><tr>
           <th style="width:60px"></th>
           <th onclick="sortHoldings('name')" style="cursor:pointer">שם / טיקר ⇅</th><th>חשבון</th><th onclick="sortHoldings('qty')" style="cursor:pointer">כמות ⇅</th><th>מטבע</th>
-          <th>עלות ממוצעת</th><th>מחיר כיום</th><th onclick="sortHoldings('change')" style="cursor:pointer">שינוי יום ⇅</th>
-          <th onclick="sortHoldings('value')" style="cursor:pointer">שווי שוק ⇅</th><th onclick="sortHoldings('pl')" style="cursor:pointer">רווח/הפסד ₪ ⇅</th><th onclick="sortHoldings('ret')" style="cursor:pointer">תשואה % ⇅</th>
+          <th>עלות ממוצעת</th><th>מחיר כיום</th><th onclick="sortHoldings('value')" style="cursor:pointer">שווי שוק ⇅</th><th onclick="sortHoldings('dayChange')" style="cursor:pointer">שינוי יום ⇅</th><th onclick="sortHoldings('plNative')" style="cursor:pointer">רווח/הפסד ⇅</th><th onclick="sortHoldings('pl')" style="cursor:pointer">רווח/הפסד ₪ ⇅</th><th onclick="sortHoldings('ret')" style="cursor:pointer">תשואה % ⇅</th>
           <th>RSI</th><th>MA150</th><th>MA200</th><th>AI</th>
         </tr></thead>
         <tbody id="holdingsBody"><tr><td colspan="15" style="text-align:center;padding:40px;color:var(--t3)">טוען...</td></tr></tbody>
@@ -1298,7 +1297,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v35';
+const APP_VERSION = 'v36';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1441,6 +1440,36 @@ function secAvgCost(s) {
 }
 function secTotalQty(s)  { const bought=(s.layers||[]).reduce((sum,l)=>sum+l.qty,0); const sold=(s.sellLayers||[]).reduce((sum,l)=>sum+l.qty,0); return Math.max(0,bought-sold); }
 function secTotalCost(s) { return s.layers ? s.layers.reduce((sum,l)=>sum+(l.price*l.qty),0) : 0; }
+
+// Cost in ILS using the exchange rate AT TIME OF PURCHASE (stored in each layer)
+function secCostILS(s) {
+  if(!s.layers||!s.layers.length) return 0;
+  return s.layers.reduce((sum,l) => {
+    const qty = l.qty||0;
+    const price = l.price||0;
+    const rate = l.exchangeRate||l.payRate||0; // rate at time of purchase
+    if(rate>0) return sum + price*qty*rate;
+    // fallback: use current rate if no stored rate
+    return sum + toILS(price*qty, l.payCurrency||s.currency);
+  }, 0);
+}
+
+// P&L in native currency (e.g. USD or EUR)
+function calcPlNative(s, price) {
+  if(price==null) return null;
+  const qty = secTotalQty(s);
+  const avg = secAvgCost(s);
+  return (price - avg) * qty;
+}
+
+// P&L in ILS using purchase rate vs current rate
+function calcPlILS(s, price, currentRateToILS) {
+  if(price==null||!currentRateToILS) return null;
+  const qty = secTotalQty(s);
+  const marketValILS = price * qty * currentRateToILS;
+  const costILS = secCostILS(s);
+  return marketValILS - costILS;
+}
 function secEarliestDate(s) { if (!s.layers||!s.layers.length) return null; return s.layers.slice().sort((a,b)=>a.date>b.date?1:-1)[0].date; }
 
 // ═══════════════════════════════════════════════════════
@@ -1616,12 +1645,83 @@ async function fetchQuote(ticker){
 
 async function fetchHistory(ticker,range='1y'){
   const key=`${ticker}_${range}`;const cached=histCache.get(key);if(cached&&Date.now()-cached.ts<300000)return cached.data;
-  // 1. Alpha Vantage
-  try{const avKey=getAlphaKey();if(avKey){const size=range==='6mo'?'compact':'full';const r=await tFetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&outputsize=${size}&apikey=${avKey}`);const d=await r.json();const ts=d['Time Series (Daily)'];if(ts){const cutoff=new Date();const months={'6mo':6,'1y':12,'2y':24,'5y':60}[range]||12;cutoff.setMonth(cutoff.getMonth()-months);const data=Object.entries(ts).map(([date,v])=>({date,close:parseFloat(v['4. close']),high:parseFloat(v['2. high']),low:parseFloat(v['3. low'])})).filter(r=>new Date(r.date)>=cutoff).sort((a,b)=>a.date.localeCompare(b.date));if(data.length>20){histCache.set(key,{data,ts:Date.now()});return data;}}}}catch(e){}
-  // 2. CORS proxy Yahoo
-  try{const yt=encodeURIComponent(ticker);const url=`https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+yt+'?interval=1d&range='+range)}`;const r=await tFetch(url);const w=await r.json();const d=w.contents?JSON.parse(w.contents):w;const result=d.chart.result[0];const data=result.timestamp.map((t,i)=>({date:new Date(t*1000).toISOString().slice(0,10),close:result.indicators.quote[0].close[i],high:result.indicators.quote[0].high[i],low:result.indicators.quote[0].low[i]})).filter(d=>d.close!=null);if(data.length>20){histCache.set(key,{data,ts:Date.now()});return data;}}catch(e){}
-  // 3. allorigins
-  try{const yt=encodeURIComponent(ticker);const yUrl=encodeURIComponent(`https://query2.finance.yahoo.com/v8/finance/chart/${yt}?interval=1d&range=${range}`);const r=await tFetch(`https://api.allorigins.win/get?url=${yUrl}`);const w=await r.json();const d=JSON.parse(w.contents);const result=d.chart.result[0];const data=result.timestamp.map((t,i)=>({date:new Date(t*1000).toISOString().slice(0,10),close:result.indicators.quote[0].close[i],high:result.indicators.quote[0].high[i],low:result.indicators.quote[0].low[i]})).filter(d=>d.close!=null);if(data.length>20){histCache.set(key,{data,ts:Date.now()});return data;}}catch(e){}
+
+  // Helper to parse Yahoo chart response
+  function parseYahooChart(d){
+    const result=d?.chart?.result?.[0];
+    if(!result||!result.timestamp)return null;
+    const data=result.timestamp.map((t,i)=>({
+      date:new Date(t*1000).toISOString().slice(0,10),
+      close:result.indicators.quote[0].close[i],
+      high:result.indicators.quote[0].high[i],
+      low:result.indicators.quote[0].low[i]
+    })).filter(d=>d.close!=null);
+    return data.length>5?data:null;
+  }
+
+  const yt=encodeURIComponent(ticker);
+  const yahooUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${yt}?interval=1d&range=${range}`;
+  const yahooUrl2=`https://query2.finance.yahoo.com/v8/finance/chart/${yt}?interval=1d&range=${range}`;
+
+  // 1. Alpha Vantage (best for US stocks)
+  try{
+    const avKey=getAlphaKey();
+    if(avKey && !ticker.includes('.')){
+      const size=range==='6mo'?'compact':'full';
+      const r=await tFetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&outputsize=${size}&apikey=${avKey}`);
+      const d=await r.json();
+      const ts=d['Time Series (Daily)'];
+      if(ts){
+        const cutoff=new Date();
+        const months={'6mo':6,'1y':12,'2y':24,'5y':60}[range]||12;
+        cutoff.setMonth(cutoff.getMonth()-months);
+        const data=Object.entries(ts).map(([date,v])=>({date,close:parseFloat(v['4. close']),high:parseFloat(v['2. high']),low:parseFloat(v['3. low'])})).filter(r=>new Date(r.date)>=cutoff).sort((a,b)=>a.date.localeCompare(b.date));
+        if(data.length>20){histCache.set(key,{data,ts:Date.now()});return data;}
+      }
+    }
+  }catch(e){}
+
+  // 2. corsproxy.io
+  try{
+    const r=await tFetch(`https://corsproxy.io/?url=${encodeURIComponent(yahooUrl)}`);
+    const d=await r.json();
+    const data=parseYahooChart(d);
+    if(data){histCache.set(key,{data,ts:Date.now()});return data;}
+  }catch(e){}
+
+  // 3. allorigins.win
+  try{
+    const r=await tFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(yahooUrl)}`);
+    const w=await r.json();
+    const d=w.contents?JSON.parse(w.contents):w;
+    const data=parseYahooChart(d);
+    if(data){histCache.set(key,{data,ts:Date.now()});return data;}
+  }catch(e){}
+
+  // 4. cors.eu.org (newer reliable proxy)
+  try{
+    const r=await tFetch(`https://cors.eu.org/${yahooUrl2}`);
+    const d=await r.json();
+    const data=parseYahooChart(d);
+    if(data){histCache.set(key,{data,ts:Date.now()});return data;}
+  }catch(e){}
+
+  // 5. thingproxy
+  try{
+    const r=await tFetch(`https://thingproxy.freeboard.io/fetch/${yahooUrl2}`);
+    const d=await r.json();
+    const data=parseYahooChart(d);
+    if(data){histCache.set(key,{data,ts:Date.now()});return data;}
+  }catch(e){}
+
+  // 6. workers.dev proxy (Cloudflare)
+  try{
+    const r=await tFetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(yahooUrl)}`);
+    const d=await r.json();
+    const data=parseYahooChart(d);
+    if(data){histCache.set(key,{data,ts:Date.now()});return data;}
+  }catch(e){}
+
   return null;
 }
 
@@ -1666,9 +1766,15 @@ async function refreshAll(){
       const avg=secAvgCost(s),qty=secTotalQty(s),cost=secTotalCost(s);
       const price=q?.price??null;
       const mv=price!=null?price*qty:null;
-      const pl=mv!=null?toILS(mv,s.currency)-toILS(cost,s.currency):null;
+      const rates=getRates();
+      const curRate=s.currency==='EUR'?(rates.EUR||4.0):s.currency==='GBP'?(rates.GBP||4.6):(rates.USD||3.65);
+      // 3 P&L values:
+      const plNative=calcPlNative(s,price);                  // רווח/הפסד במטבע המניה
+      const plILS=calcPlILS(s,price,curRate);                // רווח/הפסד בש"ח (שער קנייה vs שער היום)
+      const pl=plILS;                                         // backward compat
       const ret=cost>0&&price!=null?((price-avg)/avg)*100:null;
-      const staleInfo = q?.isStale ? {isStale:true, cachedAt:q.cachedAt||''} : {isStale:false, cachedAt:null}; portfolioData[idx]={...portfolioData[idx],quote:q,price,avgCost:avg,totalQty:qty,totalCost:cost,marketVal:mv,pl,ret,...staleInfo};
+      const staleInfo = q?.isStale ? {isStale:true, cachedAt:q.cachedAt||''} : {isStale:false, cachedAt:null};
+      portfolioData[idx]={...portfolioData[idx],quote:q,price,avgCost:avg,totalQty:qty,totalCost:cost,marketVal:mv,pl,plNative,plILS,ret,...staleInfo};
       done++;
     }catch(e){}
   }));
@@ -1818,6 +1924,8 @@ function renderHoldings(rows){
     if(holdingsSortKey==='name') return (r.name||r.ticker||'').toLowerCase();
     if(holdingsSortKey==='qty') return r.totalQty||0;
     if(holdingsSortKey==='value') return r.marketVal||0;
+    if(holdingsSortKey==='dayChange') return (r.quote?.change||0)*(r.totalQty||0);
+    if(holdingsSortKey==='plNative') return r.plNative||0;
     if(holdingsSortKey==='pl') return r.pl||0;
     if(holdingsSortKey==='ret') return r.ret||0;
     if(holdingsSortKey==='change') return r.quote?.changePct||0;
@@ -1841,9 +1949,10 @@ function renderHoldings(rows){
       <td><span class="badge b-gray">${r.currency}</span></td>
       <td class="t-mono">${fmtCur(r.avgCost,r.currency)}</td>
       <td class="t-mono" style="font-weight:600">${r.price!=null?(fmtCur(r.price,r.currency)+(r.isStale?'<div style="font-size:9px;color:var(--t3)">'+r.cachedAt+'</div>':'')):'<span class="pulse" style="color:var(--t3)">…</span>'}</td>
-      <td class="t-mono ${clsPL(r.quote?.changePct)}">${fmtPct(r.quote?.changePct)}</td>
       <td class="t-mono">${r.marketVal!=null?fmtCur(r.marketVal,r.currency,0):'—'}</td>
-      <td><div class="t-mono ${clsPL(r.pl)}" style="font-weight:600">${fmtILS(r.pl,0)}</div>${ann?`<div style="font-size:10px;color:var(--t3)">${ann}%/שנה</div>`:''}</td>
+      <td class="t-mono ${clsPL(r.quote?.change)}"><div>${r.quote?.change!=null?fmtCur(r.quote.change*r.totalQty,r.currency,0):'—'}</div><div style="font-size:10px;color:var(--t3)">${fmtPct(r.quote?.changePct)}</div></td>
+      <td class="t-mono ${clsPL(r.plNative)}" style="font-weight:600">${r.plNative!=null?fmtCur(r.plNative,r.currency,0):'—'}</td>
+      <td><div class="t-mono ${clsPL(r.plILS)}" style="font-weight:600">${fmtILS(r.plILS,0)}</div>${ann?`<div style="font-size:10px;color:var(--t3)">${ann}%/שנה</div>`:''}</td>
       <td class="t-mono ${clsPL(r.ret)}">${fmtPct(r.ret)}</td>
       <td>${a?.rsi!=null?`<span style="font-family:var(--font-mono);font-size:12px;color:${rsiCol(a.rsi)}">${a.rsi.toFixed(1)}</span>`:'—'}</td>
       <td class="t-mono" style="font-size:11px;color:var(--t2)">${a?.ma150?fmtCur(a.ma150,r.currency,0):'—'}</td>
