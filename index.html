@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v37</title>
+<title>Investment Agent v38</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v37</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v38</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -422,7 +422,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v37</div>
+    <div class="logo-sub">PORTFOLIO · v38</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -470,6 +470,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </button>
     <button class="nav-btn" onclick="showPage('import',this)">
       <span class="nav-icon">📥</span><span>ייבוא / ייצוא</span>
+    </button>
+    <button class="nav-btn" onclick="quickGistSave()" id="navGistBtn" style="margin-top:4px;border:1px solid rgba(255,255,255,.15)">
+      <span class="nav-icon">☁️</span><span id="navGistLabel">שמור ל-Gist</span>
     </button>
   </div>
   <div class="sidebar-foot">
@@ -754,6 +757,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="tbl-wrap">
       <table>
         <thead><tr>
+          <th style="width:60px"></th>
           <th onclick="sortEmpShares('type')" style="cursor:pointer">סוג ⇅</th>
           <th onclick="sortEmpShares('qtyOrig')" style="cursor:pointer">כמות מקורית ⇅</th>
           <th onclick="sortEmpShares('qtyVest')" style="cursor:pointer">כמות הבשלה ⇅</th>
@@ -950,6 +954,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
     </div>
 
+    <!-- Update Exchange Rates -->
+    <div class="card" style="margin-bottom:16px;border-right:3px solid var(--green)">
+      <div class="card-title">💱 עדכון שע"ח היסטורי לשכבות קנייה</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.7">
+        שולף אוטומטית את שע"ח בתאריך כל קנייה (דולר/יורו לשקל) מ-frankfurter.app.<br>
+        הרץ פעם אחת — ישלים שכבות שאין להן שע"ח.
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn btn-primary" onclick="runFetchAllRates()" id="fetchRatesBtn">🔄 עדכן שע"ח לכל השכבות</button>
+        <div id="fetchRatesStatus" style="font-size:13px;color:var(--t2)"></div>
+      </div>
+    </div>
+
     <!-- TOTP 2FA -->
     <div class="card" style="margin-bottom:16px;border-right:3px solid var(--blue)">
       <div class="card-title">🔐 אימות דו-שלבי — Google Authenticator</div>
@@ -1134,7 +1151,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <button class="btn btn-ghost btn-sm" onclick="addLayerRow()">+ שכבה</button>
       </div>
       <table class="layers-table">
-        <thead><tr><th>תאריך קנייה</th><th>כמות</th><th>מחיר קנייה</th><th>מטבע תשלום</th><th>עמלה</th><th></th></tr></thead>
+        <thead><tr><th>תאריך קנייה</th><th>כמות</th><th>מחיר קנייה</th><th>שע"ח</th><th>מטבע תשלום</th><th>עמלה</th><th></th></tr></thead>
         <tbody id="layersBody"></tbody>
       </table>
       <div style="font-size:11px;color:var(--t3);margin-top:6px">כל שכבה = עסקה נפרדת. עלות ממוצעת תחושב אוטומטית.</div>
@@ -1331,7 +1348,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v37';
+const APP_VERSION = 'v38';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -1496,13 +1513,29 @@ function calcPlNative(s, price) {
   return (price - avg) * qty;
 }
 
-// P&L in ILS using purchase rate vs current rate
+// P&L in ILS using purchase rate per layer vs current rate
 function calcPlILS(s, price, currentRateToILS) {
   if(price==null||!currentRateToILS) return null;
   const qty = secTotalQty(s);
   const marketValILS = price * qty * currentRateToILS;
-  const costILS = secCostILS(s);
+  // Use per-layer exchange rates if available
+  const costILS = secCostILSWithRates(s, currentRateToILS);
   return marketValILS - costILS;
+}
+
+function secCostILSWithRates(s, currentRate) {
+  if(!s.layers||!s.layers.length) return 0;
+  // Subtract sells from layers (FIFO approximation)
+  const soldQty = (s.sellLayers||[]).reduce((sum,l)=>sum+(l.qty||0),0);
+  let remainingSold = soldQty;
+  return s.layers.reduce((sum,l) => {
+    const layerQty = l.qty||0;
+    const effectiveQty = Math.max(0, layerQty - remainingSold);
+    remainingSold = Math.max(0, remainingSold - layerQty);
+    if(effectiveQty === 0) return sum;
+    const rate = l.exchangeRate || currentRate; // fallback to current rate
+    return sum + (l.price||0) * effectiveQty * rate;
+  }, 0);
 }
 function secEarliestDate(s) { if (!s.layers||!s.layers.length) return null; return s.layers.slice().sort((a,b)=>a.date>b.date?1:-1)[0].date; }
 
@@ -1989,8 +2022,8 @@ function renderHoldings(rows){
       <td><span class="badge b-gray">${r.currency}</span></td>
       <td class="t-mono">${fmtCur(r.avgCost,r.currency)}</td>
       <td class="t-mono" style="font-weight:600">${r.price!=null?(fmtCur(r.price,r.currency)+(r.isStale?'<div style="font-size:9px;color:var(--t3)">'+r.cachedAt+'</div>':'')):'<span class="pulse" style="color:var(--t3)">…</span>'}</td>
-      <td class="t-mono">${r.marketVal!=null?fmtCur(r.marketVal,r.currency,0):'—'}</td>
       <td class="t-mono ${clsPL(r.quote?.change)}"><div>${r.quote?.change!=null?fmtCur(r.quote.change*r.totalQty,r.currency,0):'—'}</div><div style="font-size:10px;color:var(--t3)">${fmtPct(r.quote?.changePct)}</div></td>
+      <td class="t-mono">${r.marketVal!=null?fmtCur(r.marketVal,r.currency,0):'—'}</td>
       <td class="t-mono ${clsPL(r.plNative)}" style="font-weight:600">${r.plNative!=null?fmtCur(r.plNative,r.currency,0):'—'}</td>
       <td><div class="t-mono ${clsPL(r.plILS)}" style="font-weight:600">${fmtILS(r.plILS,0)}</div>${ann?`<div style="font-size:10px;color:var(--t3)">${ann}%/שנה</div>`:''}</td>
       <td class="t-mono ${clsPL(r.ret)}">${fmtPct(r.ret)}</td>
@@ -2344,19 +2377,21 @@ function openEditSecurityModal(id){
 
 function renderLayerRows(){
   const tbody=document.getElementById('layersBody');
+  const inp = (extra) => `style="font-family:var(--font-mono);font-size:11px;border:1px solid var(--border);border-radius:5px;padding:3px 6px;background:#fff;direction:ltr;${extra||''}"`;
   tbody.innerHTML=tempLayers.map((l,i)=>`<tr>
-    <td><input type="date" value="${l.date||''}" onchange="tempLayers[${i}].date=this.value" style="font-family:var(--font-mono);font-size:11px;border:1px solid var(--border);border-radius:5px;padding:3px 6px;background:#fff;direction:ltr"/></td>
-    <td><input type="number" step="any" value="${l.qty||''}" placeholder="כמות" onchange="tempLayers[${i}].qty=parseFloat(this.value)||0" style="font-family:var(--font-mono);font-size:11px;border:1px solid var(--border);border-radius:5px;padding:3px 6px;width:70px;background:#fff;direction:ltr"/></td>
-    <td><input type="number" step="any" value="${l.price||''}" placeholder="מחיר" onchange="tempLayers[${i}].price=parseFloat(this.value)||0" style="font-family:var(--font-mono);font-size:11px;border:1px solid var(--border);border-radius:5px;padding:3px 6px;width:80px;background:#fff;direction:ltr"/></td>
+    <td><input type="date" value="${l.date||''}" onchange="tempLayers[${i}].date=this.value;fetchLayerRate(${i},this.value,document.getElementById('secCurrency').value)" ${inp()}/></td>
+    <td><input type="number" step="any" value="${l.qty||''}" placeholder="כמות" onchange="tempLayers[${i}].qty=parseFloat(this.value)||0" ${inp('width:70px')}/></td>
+    <td><input type="number" step="any" value="${l.price||''}" placeholder="מחיר" onchange="tempLayers[${i}].price=parseFloat(this.value)||0" ${inp('width:80px')}/></td>
+    <td><input type="number" step="any" id="layerRate_${i}" value="${l.exchangeRate||''}" placeholder='שע"ח' onchange="tempLayers[${i}].exchangeRate=parseFloat(this.value)||0" ${inp('width:70px;background:${l.exchangeRate?"#f0fff4":"#fff"}')}/></td>
     <td><select onchange="tempLayers[${i}].payCurrency=this.value" style="font-family:var(--font-mono);font-size:11px;border:1px solid var(--border);border-radius:5px;padding:3px 5px;background:#fff">
       <option value="USD" ${l.payCurrency==='USD'?'selected':''}>USD</option>
       <option value="ILS" ${l.payCurrency==='ILS'?'selected':''}>ILS</option>
       <option value="EUR" ${l.payCurrency==='EUR'?'selected':''}>EUR</option>
     </select></td>
-    <td><input type="number" step="any" value="${l.fee||0}" onchange="tempLayers[${i}].fee=parseFloat(this.value)||0" style="font-family:var(--font-mono);font-size:11px;border:1px solid var(--border);border-radius:5px;padding:3px 6px;width:60px;background:#fff;direction:ltr"/></td>
+    <td><input type="number" step="any" value="${l.fee||0}" onchange="tempLayers[${i}].fee=parseFloat(this.value)||0" ${inp('width:60px')}/></td>
     <td><button onclick="removeLayer(${i})" style="background:var(--redbg);color:var(--red);border:1px solid var(--redborder);border-radius:4px;padding:2px 7px;cursor:pointer;font-size:11px">✕</button></td>
   </tr>`).join('');
-  if(!tempLayers.length)tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:10px;color:var(--t3);font-size:12px">לחץ "+ שכבה" להוספת עסקת קנייה</td></tr>';
+  if(!tempLayers.length)tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:10px;color:var(--t3);font-size:12px">לחץ "+ שכבה" להוספת עסקת קנייה</td></tr>';
 }
 
 function addLayerRow(){ tempLayers.push({date:new Date().toISOString().slice(0,10),qty:0,price:0,payCurrency:document.getElementById('secCurrency').value||'USD',fee:0}); renderLayerRows(); }
@@ -2665,6 +2700,55 @@ function saveJournalEntry(){
 }
 
 // Apply a buy transaction to portfolio layers (FIFO)
+async function fetchLayerRate(idx, date, currency){
+  if(!date||!currency||currency==='ILS') return;
+  const rateEl = document.getElementById('layerRate_'+idx);
+  if(!rateEl) return;
+  rateEl.placeholder = '⏳';
+  try{
+    // Use frankfurter.app for EUR, ECB-based rates
+    const from = currency==='USD'?'USD':'EUR';
+    const r = await fetch(`https://api.frankfurter.app/${date}?from=${from}&to=ILS`);
+    if(r.ok){
+      const d = await r.json();
+      const rate = d.rates?.ILS;
+      if(rate){
+        rateEl.value = rate.toFixed(4);
+        if(tempLayers[idx]) tempLayers[idx].exchangeRate = rate;
+        rateEl.placeholder = 'שע"ח';
+        return;
+      }
+    }
+  }catch(e){}
+  rateEl.placeholder = 'שע"ח';
+}
+
+async function fetchAllLayerRates(){
+  const sec = loadSecurities();
+  let updated = 0;
+  for(const s of sec){
+    if(!s.layers||!s.layers.length) continue;
+    const currency = s.currency;
+    if(currency==='ILS') continue;
+    const from = currency==='USD'?'USD':'EUR';
+    for(const layer of s.layers){
+      if(layer.exchangeRate) continue; // already has rate
+      if(!layer.date) continue;
+      try{
+        await new Promise(r=>setTimeout(r,300)); // rate limit
+        const r = await fetch(`https://api.frankfurter.app/${layer.date}?from=${from}&to=ILS`);
+        if(r.ok){
+          const d = await r.json();
+          const rate = d.rates?.ILS;
+          if(rate){ layer.exchangeRate = parseFloat(rate.toFixed(4)); updated++; }
+        }
+      }catch(e){}
+    }
+    saveSecurities(sec);
+  }
+  return updated;
+}
+
 function applyBuyToPortfolio(entry){
   if(!entry.ticker||!entry.qty||!entry.price) return;
   const securities=loadSecurities();
@@ -3309,6 +3393,25 @@ function saveAdminClaudeKey(){const k=document.getElementById('adminClaudeKey').
 // ═══════════════════════════════════════════════════════
 //  GITHUB GIST SYNC
 // ═══════════════════════════════════════════════════════
+async function quickGistSave(){
+  const btn = document.getElementById('navGistBtn');
+  const lbl = document.getElementById('navGistLabel');
+  if(!getGistToken()||!getGistId()){
+    alert('הגדר GitHub Token ו-Gist ID בהגדרות תחילה');
+    return;
+  }
+  if(lbl) lbl.textContent = '⏳ שומר...';
+  if(btn) btn.disabled = true;
+  try {
+    await gistSave(true);
+    if(lbl) lbl.textContent = '✅ נשמר!';
+    setTimeout(()=>{ if(lbl) lbl.textContent='שמור ל-Gist'; if(btn) btn.disabled=false; }, 2000);
+  } catch(e) {
+    if(lbl) lbl.textContent = '❌ שגיאה';
+    setTimeout(()=>{ if(lbl) lbl.textContent='שמור ל-Gist'; if(btn) btn.disabled=false; }, 2000);
+  }
+}
+
 let _gistSyncTimer = null;
 function scheduleGistSync(){
   // Only auto-sync if token and gist ID are configured
@@ -3431,6 +3534,23 @@ function initTOTPUI(){
   if(secEl) secEl.textContent = secret;
   const chk = document.getElementById('totpEnabledCheck');
   if(chk) chk.checked = LS.get('ia_totp_enabled', true);
+}
+
+async function runFetchAllRates(){
+  const btn = document.getElementById('fetchRatesBtn');
+  const status = document.getElementById('fetchRatesStatus');
+  btn.disabled = true;
+  status.textContent = '⏳ מושך שע"ח...';
+  try{
+    const updated = await fetchAllLayerRates();
+    status.textContent = `✅ עודכנו ${updated} שכבות`;
+    status.style.color = 'var(--green)';
+  }catch(e){
+    status.textContent = '❌ שגיאה: '+e.message;
+    status.style.color = 'var(--red)';
+  }
+  btn.disabled = false;
+  refreshAll();
 }
 
 function toggleTOTP(enabled){
@@ -3893,7 +4013,9 @@ function editEmpShare(id){
 
 function toggleVestFields(status){
   const sf = document.getElementById('esSaleFields');
-  if(sf) sf.style.display = (status==='נמכר') ? 'block' : 'none';
+  if(sf) sf.style.display = 'block'; // always show sale fields
+  // Highlight sale section when status is נמכר
+  if(sf) sf.style.borderColor = status==='נמכר' ? 'var(--green)' : 'var(--border)';
 }
 
 function saveEmpShare(){
@@ -3966,7 +4088,7 @@ function exportEmpSharesExcel(){
 // ═══════════════════════════════════════════════════════
 //  BOOT — wait for DOM
 // ═══════════════════════════════════════════════════════
-function boot(){
+async function boot(){
   seedPortfolio();
   seedEmpShares();
   updateAlertBadge();
@@ -3977,6 +4099,37 @@ function boot(){
   renderInsurance();
   renderOverview();
   renderJournal();
+
+  // Auto-load from Gist if configured and localStorage seems empty/new
+  const hasToken = getGistToken();
+  const hasGistId = getGistId();
+  const hasLocalData = loadSecurities().length > 0;
+  if(hasToken && hasGistId && !hasLocalData){
+    // Silent auto-load — no confirm dialog
+    try{
+      setGistStatus('⏳ טוען נתונים מ-Gist...', 'blue');
+      const res = await fetch('https://api.github.com/gists/'+getGistId(), {
+        headers: { 'Authorization': 'token '+getGistToken() }
+      });
+      if(res.ok){
+        const gist = await res.json();
+        const raw = gist.files?.['investment_data.json']?.content;
+        if(raw){
+          const d = JSON.parse(raw);
+          if(d.securities) { LS.set('ia_securities', d.securities); }
+          if(d.insurance)  { LS.set('ia_insurance', d.insurance); }
+          if(d.overview)   { LS.set('ia_overview', d.overview); }
+          if(d.journal)    { LS.set('ia_journal', d.journal); }
+          if(d.memory)     { LS.set('ia_memory', d.memory); }
+          if(d.empshares)  { LS.set('ia_empshares', d.empshares); }
+          if(d.rates)      { LS.set('ia_rates', d.rates); }
+          setGistStatus('✅ נטען אוטומטית מ-Gist', 'green');
+          renderInsurance(); renderOverview(); renderJournal(); renderEmpShares();
+        }
+      }
+    }catch(e){ console.warn('Auto Gist load failed:', e.message); }
+  }
+
   refreshAll();
 }
 
@@ -4025,6 +4178,7 @@ if(document.readyState==='loading'){
       <div class="fg"><label class="fl">סטטוס</label>
         <select class="fi" id="esStatus" onchange="toggleVestFields(this.value)">
           <option value="הבשיל">הבשיל ✅</option>
+          <option value="נמכר">נמכר 💰</option>
           <option value="טרם הבשיל">טרם הבשיל ⏳</option>
           <option value="בוטל">בוטל ❌</option>
         </select>
