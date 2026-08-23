@@ -1348,7 +1348,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v38';
+const APP_VERSION = 'v39';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -2704,11 +2704,13 @@ async function fetchLayerRate(idx, date, currency){
   if(!date||!currency||currency==='ILS') return;
   const rateEl = document.getElementById('layerRate_'+idx);
   if(!rateEl) return;
+  const normDate = normalizeDateForFrankfurter(date);
+  if(!normDate){ rateEl.placeholder = 'שע"ח (תאריך?)'; return; }
   rateEl.placeholder = '⏳';
   try{
     // Use frankfurter.app for EUR, ECB-based rates
     const from = currency==='USD'?'USD':'EUR';
-    const r = await fetch(`https://api.frankfurter.app/${date}?from=${from}&to=ILS`);
+    const r = await fetch(`https://api.frankfurter.app/${normDate}?from=${from}&to=ILS`);
     if(r.ok){
       const d = await r.json();
       const rate = d.rates?.ILS;
@@ -2723,30 +2725,51 @@ async function fetchLayerRate(idx, date, currency){
   rateEl.placeholder = 'שע"ח';
 }
 
+function normalizeDateForFrankfurter(dateStr){
+  // Accepts YYYY-MM-DD (already fine) or DD/MM/YYYY (from older manual/Excel imports) and normalizes to YYYY-MM-DD
+  if(!dateStr) return null;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  const m = dateStr.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})$/);
+  if(m){
+    const [,d,mo,y] = m;
+    return `${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;
+  }
+  return null; // unrecognized format
+}
+
 async function fetchAllLayerRates(){
   const sec = loadSecurities();
   let updated = 0;
+  const diag = { scannedLayers:0, alreadyHadRate:0, noDate:0, badDateFormat:0, ilsSkipped:0, httpFail:0, noRateInResponse:0, networkError:0, updated:0, lastError:'' };
   for(const s of sec){
     if(!s.layers||!s.layers.length) continue;
     const currency = s.currency;
-    if(currency==='ILS') continue;
+    if(currency==='ILS'){ diag.ilsSkipped += s.layers.length; continue; }
     const from = currency==='USD'?'USD':'EUR';
     for(const layer of s.layers){
-      if(layer.exchangeRate) continue; // already has rate
-      if(!layer.date) continue;
+      diag.scannedLayers++;
+      if(layer.exchangeRate){ diag.alreadyHadRate++; continue; }
+      if(!layer.date){ diag.noDate++; continue; }
+      const normDate = normalizeDateForFrankfurter(layer.date);
+      if(!normDate){ diag.badDateFormat++; diag.lastError = `תאריך לא תקין: "${layer.date}" (${s.ticker||'?'})`; continue; }
       try{
-        await new Promise(r=>setTimeout(r,300)); // rate limit
-        const r = await fetch(`https://api.frankfurter.app/${layer.date}?from=${from}&to=ILS`);
+        await new Promise(r=>setTimeout(r,300)); // be polite to the API
+        const r = await fetch(`https://api.frankfurter.app/${normDate}?from=${from}&to=ILS`);
         if(r.ok){
           const d = await r.json();
           const rate = d.rates?.ILS;
-          if(rate){ layer.exchangeRate = parseFloat(rate.toFixed(4)); updated++; }
+          if(rate){ layer.exchangeRate = parseFloat(rate.toFixed(4)); updated++; diag.updated++; }
+          else { diag.noRateInResponse++; diag.lastError = `אין שער ILS בתשובה עבור ${normDate} (${s.ticker||'?'})`; }
+        } else {
+          diag.httpFail++; diag.lastError = `HTTP ${r.status} עבור ${normDate} (${s.ticker||'?'})`;
         }
-      }catch(e){}
+      }catch(e){
+        diag.networkError++; diag.lastError = `שגיאת רשת: ${e.message} (${s.ticker||'?'})`;
+      }
     }
     saveSecurities(sec);
   }
-  return updated;
+  return { updated, diag };
 }
 
 function applyBuyToPortfolio(entry){
@@ -3542,9 +3565,20 @@ async function runFetchAllRates(){
   btn.disabled = true;
   status.textContent = '⏳ מושך שע"ח...';
   try{
-    const updated = await fetchAllLayerRates();
-    status.textContent = `✅ עודכנו ${updated} שכבות`;
-    status.style.color = 'var(--green)';
+    const {updated, diag} = await fetchAllLayerRates();
+    let msg = `✅ עודכנו ${updated} שכבות מתוך ${diag.scannedLayers} שנבדקו`;
+    const parts = [];
+    if(diag.alreadyHadRate) parts.push(`${diag.alreadyHadRate} כבר היו עם שע"ח`);
+    if(diag.ilsSkipped) parts.push(`${diag.ilsSkipped} בש"ח (לא רלוונטי)`);
+    if(diag.noDate) parts.push(`${diag.noDate} בלי תאריך`);
+    if(diag.badDateFormat) parts.push(`${diag.badDateFormat} פורמט תאריך לא תקין`);
+    if(diag.httpFail) parts.push(`${diag.httpFail} כשלי שרת`);
+    if(diag.noRateInResponse) parts.push(`${diag.noRateInResponse} בלי שער בתשובה`);
+    if(diag.networkError) parts.push(`${diag.networkError} שגיאות רשת`);
+    if(parts.length) msg += ' | ' + parts.join(', ');
+    if(diag.lastError) msg += ` | דוגמה: ${diag.lastError}`;
+    status.textContent = msg;
+    status.style.color = updated>0 ? 'var(--green)' : 'var(--red)';
   }catch(e){
     status.textContent = '❌ שגיאה: '+e.message;
     status.style.color = 'var(--red)';
