@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Investment Agent v39</title>
+<title>Investment Agent v41</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- iPhone PWA -->
@@ -347,7 +347,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   ">
     <div style="font-size:40px;margin-bottom:8px">📈</div>
     <div style="font-size:22px;font-weight:700;color:#0d1e35;margin-bottom:4px">Invest<span style="color:#1460ae">.</span>Agent</div>
-    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v39</div>
+    <div style="font-family:monospace;font-size:11px;color:#7a9ab8;margin-bottom:28px;letter-spacing:.1em">PORTFOLIO · v41</div>
 
     <div style="text-align:right;margin-bottom:6px">
       <label style="font-size:12px;color:#3a5470;font-weight:600">סיסמה</label>
@@ -422,7 +422,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-name">Invest<span class="logo-dot">.</span>Agent</div>
-    <div class="logo-sub">PORTFOLIO · v39</div>
+    <div class="logo-sub">PORTFOLIO · v41</div>
   </div>
   <div class="nav">
     <div class="nav-section">ראשי</div>
@@ -473,6 +473,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </button>
     <button class="nav-btn" onclick="quickGistSave()" id="navGistBtn" style="margin-top:4px;border:1px solid rgba(255,255,255,.15)">
       <span class="nav-icon">☁️</span><span id="navGistLabel">שמור ל-Gist</span>
+    </button>
+    <button class="nav-btn" onclick="quickGistPull()" id="navGistPullBtn" style="margin-top:4px;border:1px solid rgba(255,255,255,.15)">
+      <span class="nav-icon">🔄</span><span id="navGistPullLabel">משוך עדכונים</span>
     </button>
   </div>
   <div class="sidebar-foot">
@@ -1348,7 +1351,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 // ═══════════════════════════════════════════════════════
 //  CONFIG & API KEYS (hardcoded + user override)
 // ═══════════════════════════════════════════════════════
-const APP_VERSION = 'v39';
+const APP_VERSION = 'v41';
 const REFRESH_INTERVAL = 60;
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
@@ -2710,7 +2713,7 @@ async function fetchLayerRate(idx, date, currency){
   try{
     // Use frankfurter.app for EUR, ECB-based rates
     const from = currency==='USD'?'USD':'EUR';
-    const r = await fetch(`https://api.frankfurter.app/${normDate}?from=${from}&to=ILS`);
+    const r = await fetch(`https://api.frankfurter.dev/v1/${normDate}?from=${from}&to=ILS`);
     if(r.ok){
       const d = await r.json();
       const rate = d.rates?.ILS;
@@ -2754,7 +2757,7 @@ async function fetchAllLayerRates(){
       if(!normDate){ diag.badDateFormat++; diag.lastError = `תאריך לא תקין: "${layer.date}" (${s.ticker||'?'})`; continue; }
       try{
         await new Promise(r=>setTimeout(r,300)); // be polite to the API
-        const r = await fetch(`https://api.frankfurter.app/${normDate}?from=${from}&to=ILS`);
+        const r = await fetch(`https://api.frankfurter.dev/v1/${normDate}?from=${from}&to=ILS`);
         if(r.ok){
           const d = await r.json();
           const rate = d.rates?.ILS;
@@ -3435,6 +3438,25 @@ async function quickGistSave(){
   }
 }
 
+async function quickGistPull(){
+  const btn = document.getElementById('navGistPullBtn');
+  const lbl = document.getElementById('navGistPullLabel');
+  if(!getGistToken()||!getGistId()){
+    alert('הגדר GitHub Token ו-Gist ID בהגדרות תחילה');
+    return;
+  }
+  if(btn) btn.disabled = true;
+  if(lbl) lbl.textContent = '⏳ מושך...';
+  try {
+    const ok = await gistLoad(); // includes its own confirm() + full UI refresh
+    if(lbl) lbl.textContent = ok ? '✅ עודכן!' : 'משוך עדכונים';
+  } catch(e) {
+    if(lbl) lbl.textContent = '❌ שגיאה';
+  } finally {
+    setTimeout(()=>{ if(lbl) lbl.textContent='משוך עדכונים'; if(btn) btn.disabled=false; }, 2000);
+  }
+}
+
 let _gistSyncTimer = null;
 function scheduleGistSync(){
   // Only auto-sync if token and gist ID are configured
@@ -3512,18 +3534,18 @@ async function gistSave(silent=false){
 async function gistLoad(){
   const token = getGistToken();
   const gistId = getGistId();
-  if(!token){ setGistStatus('⚠ חסר GitHub Token', 'red'); return; }
-  if(!gistId){ setGistStatus('⚠ חסר Gist ID — שמור קודם ממכשיר אחר', 'red'); return; }
-  if(!confirm('טען נתונים מה-Gist? הנתונים הנוכחיים יוחלפו.')) return;
+  if(!token){ setGistStatus('⚠ חסר GitHub Token', 'red'); return false; }
+  if(!gistId){ setGistStatus('⚠ חסר Gist ID — שמור קודם ממכשיר אחר', 'red'); return false; }
+  if(!confirm('טען נתונים מה-Gist? הנתונים הנוכחיים יוחלפו.')) return false;
   setGistStatus('⏳ טוען מ-Gist...', 'blue');
   try {
     const res = await fetch('https://api.github.com/gists/'+gistId, {
       headers: { 'Authorization': 'token '+token }
     });
-    if(!res.ok){ setGistStatus('❌ שגיאה: '+res.status, 'red'); return; }
+    if(!res.ok){ setGistStatus('❌ שגיאה: '+res.status, 'red'); return false; }
     const gist = await res.json();
     const raw = gist.files?.['investment_data.json']?.content;
-    if(!raw){ setGistStatus('❌ לא נמצא קובץ investment_data.json ב-Gist', 'red'); return; }
+    if(!raw){ setGistStatus('❌ לא נמצא קובץ investment_data.json ב-Gist', 'red'); return false; }
     const d = JSON.parse(raw);
     // Backup before overwrite
     try { LS.set('ia_auto_backup', { ...gistPayload(), ts: new Date().toISOString() }); } catch(e){}
@@ -3540,8 +3562,10 @@ async function gistLoad(){
     renderOverview();
     renderJournal();
     renderEmpShares();
+    return true;
   } catch(e) {
     setGistStatus('❌ שגיאה: '+e.message, 'red');
+    return false;
   }
 }
 
